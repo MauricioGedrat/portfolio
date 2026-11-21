@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { HeroName } from "@/components/hero-name";
+import { PcbPulse } from "@/components/pcb-pulse";
 import { ScopeTrace } from "@/components/scope-trace";
 import { SectionHeading } from "@/components/section-heading";
 import { WorkIndex } from "@/components/work-index";
@@ -76,6 +77,11 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
       {/* ───────────── 02 About ───────────── */}
       <section id="about" aria-labelledby="about-title" className="grid-frame py-24 md:py-32">
         <SectionHeading id="about" title={d.about.title} />
+        <PcbPulse
+          alt={d.about.mediaAlt}
+          caption={d.about.mediaCaption}
+          className="col-span-12 mt-10 md:col-span-11 md:col-start-2"
+        />
         <dl className="col-span-12 mt-10 md:col-span-11 md:col-start-2">
           {about.map(({ key, text }) => (
             <div key={key} className="grid grid-cols-12 gap-x-[var(--gutter)] gap-y-2 border-b border-graticule py-7">
