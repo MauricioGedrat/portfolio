@@ -1,5 +1,6 @@
 import type { Dictionary, Locale } from "@/lib/i18n";
 import { profile } from "@/content/profile";
+import { photos } from "@/lib/photos";
 
 /** Cached at build time: the site is rebuilt on every deploy. */
 async function currentYear() {
@@ -32,6 +33,24 @@ export async function Footer({ lang, d }: { lang: Locale; d: Dictionary }) {
           <li className="tabular">© {year}</li>
           <li>{profile.location[lang]}</li>
         </ul>
+        <p className="col-span-12 text-xs leading-relaxed text-dim/90">
+          {lang === "pt" ? "Fotos ilustrativas de fundo: " : "Illustrative background photos: "}
+          {Object.values(photos).map((ph, i, all) => (
+            <span key={ph.id}>
+              <a className="link-quiet hover:text-ink" href={ph.page} rel="noopener" target="_blank">
+                {ph.author}
+              </a>
+              {i < all.length - 1 ? ", " : " "}
+            </span>
+          ))}
+          {lang === "pt" ? "no " : "on "}
+          <a className="link-quiet hover:text-ink" href="https://unsplash.com" rel="noopener" target="_blank">
+            Unsplash
+          </a>
+          {lang === "pt"
+            ? ". As fotos dos projetos são registros reais do Maurício."
+            : ". Project photos are Maurício's own records."}
+        </p>
       </div>
     </footer>
   );

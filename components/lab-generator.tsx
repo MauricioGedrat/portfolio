@@ -3,10 +3,12 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Locale } from "@/content/types";
+import { CH } from "@/lib/accent";
 
 type Wave = "square" | "triangle" | "sine";
 
 const M = 1024; // samples per period
+const waveColor: Record<Wave, string> = { sine: CH.ch1, square: CH.ch2, triangle: CH.ch3 };
 const HARM = 10;
 const SLEW = 0.5e6; // LM324: 0.5 V/µs
 const RAIL = 12;
@@ -158,9 +160,9 @@ export function LabGenerator({ lang }: { lang: Locale }) {
       g.stroke();
     }
     // trace: 2.5 periods across the screen
-    g.strokeStyle = "#e8d44d";
+    g.strokeStyle = waveColor[wave];
     g.lineWidth = 1.75;
-    g.shadowColor = "rgba(232,212,77,0.45)";
+    g.shadowColor = `${waveColor[wave]}88`;
     g.shadowBlur = 6;
     g.beginPath();
     const pts = 900;
@@ -174,7 +176,7 @@ export function LabGenerator({ lang }: { lang: Locale }) {
       else g.lineTo(x, y);
     }
     g.stroke();
-  }, [sig, vdiv]);
+  }, [sig, vdiv, wave]);
 
   const db = h.map((v) => (h[0] > 0 && v > 0 ? 20 * Math.log10(v / h[0]) : -80));
 
@@ -190,7 +192,8 @@ export function LabGenerator({ lang }: { lang: Locale }) {
                 type="button"
                 aria-pressed={wave === w}
                 onClick={() => setWave(w)}
-                className={`flex-1 px-3 py-2 transition-colors ${wave === w ? "bg-ink text-screen" : "text-dim hover:text-ink"}`}
+                className={`flex-1 px-3 py-2 font-semibold transition-colors ${wave === w ? "text-screen" : "text-dim hover:text-ink"}`}
+                style={wave === w ? { background: waveColor[w] } : undefined}
               >
                 {c.waves[w]}
               </button>
@@ -236,7 +239,7 @@ export function LabGenerator({ lang }: { lang: Locale }) {
           <div className="flex items-baseline justify-between text-sm">
             <p className="text-dim">{c.fft}</p>
             <p className="tabular">
-              {c.thd} <span className="text-ch1">{fmtNum(thd, lang, 1)} %</span>
+              {c.thd} <span style={{ color: waveColor[wave] }}>{fmtNum(thd, lang, 1)} %</span>
             </p>
           </div>
           <svg viewBox="0 0 400 110" className="mt-3 h-28 w-full" role="img" aria-label={`${c.thd} ${fmtNum(thd, lang, 1)} %`}>
@@ -253,7 +256,7 @@ export function LabGenerator({ lang }: { lang: Locale }) {
               const hgt = Math.max(0, ((Math.max(d, -60) + 60) / 60) * 84);
               return (
                 <g key={i}>
-                  <rect x={x} y={92 - hgt} width="22" height={hgt} rx="1.5" fill={i === 0 ? "#e8d44d" : "#8b939a"} />
+                  <rect x={x} y={92 - hgt} width="22" height={hgt} rx="1.5" fill={waveColor[wave]} fillOpacity={i === 0 ? 1 : 0.45} />
                   <text x={x + 11} y="104" textAnchor="middle" fontSize="8" fill="#8b939a">
                     {i + 1}
                   </text>

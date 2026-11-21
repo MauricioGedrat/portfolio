@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, type CSSProperties } from "react";
 import type { Locale, SkillGroup } from "@/content/types";
+import { accent, skillGroupChannel } from "@/lib/accent";
 import { t } from "@/lib/i18n";
 
 type Titles = Record<string, string>;
@@ -34,11 +35,14 @@ export function SkillsBoard({
           <div
             key={g.id}
             data-reveal="line"
-            style={{ "--d": `${gi * 70}ms` } as CSSProperties}
+            style={{ ...accent(skillGroupChannel(g.id)), "--d": `${gi * 70}ms` } as CSSProperties}
             className="rule-b grid grid-cols-12 gap-x-[var(--gutter)] gap-y-3 py-7"
           >
             <div className="col-span-12 md:col-span-3">
-              <h3 className="text-lg font-semibold">{g.name[lang]}</h3>
+              <h3 className="flex items-center gap-2 text-lg font-semibold">
+                <span aria-hidden className="bg-accent size-2 rounded-full shadow-[0_0_8px_var(--accent)]" />
+                {g.name[lang]}
+              </h3>
               <p className="mt-1 text-sm text-dim">{g.role[lang]}</p>
             </div>
             <ul className="col-span-12 flex flex-wrap gap-x-1 gap-y-1 md:col-span-5">
@@ -56,13 +60,13 @@ export function SkillsBoard({
                       onFocus={pick}
                       onClick={pick}
                       className={`relative px-2 py-1 transition-colors duration-[var(--dur-fast)] ${
-                        on ? "text-ch1" : it.projects?.length ? "text-ink hover:text-ch1" : "text-ink/70"
+                        on ? "text-accent" : it.projects?.length ? "text-ink hover:text-[var(--accent)]" : "text-ink/70"
                       }`}
                     >
                       {name}
                       <span
                         aria-hidden
-                        className={`absolute inset-x-2 -bottom-px h-px origin-left bg-ch1 transition-transform duration-[var(--dur-base)] ease-[var(--ease-out-expo)] ${
+                        className={`bg-accent absolute inset-x-2 -bottom-px h-px origin-left transition-transform duration-[var(--dur-base)] ease-[var(--ease-out-expo)] ${
                           on ? "scale-x-100" : "scale-x-0"
                         }`}
                       />

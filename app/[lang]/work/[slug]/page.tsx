@@ -3,10 +3,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { ViewTransition } from "react";
 import { notFound } from "next/navigation";
+import { Photo } from "@/components/photo";
 import { SignalChain } from "@/components/signal-chain";
 import { projects } from "@/content/projects";
 import { getProjectBySlug, getProjects } from "@/lib/content";
 import { getDictionary, hasLocale, locales, t } from "@/lib/i18n";
+import { accent, cssVar, disciplineChannel, disciplineLabel } from "@/lib/accent";
+import { photos, projectBanner } from "@/lib/photos";
 
 export function generateStaticParams() {
   return locales.flatMap((lang) => projects.map((p) => ({ lang, slug: p.slug })));
@@ -36,10 +39,20 @@ export default async function CaseStudy({ params }: PageProps<"/[lang]/work/[slu
   const ranked = await getProjects();
   const next = ranked[(ranked.findIndex((x) => x.slug === p.slug) + 1) % ranked.length];
   const [headline, subhead] = p.title.split(":");
+  const banner = projectBanner[p.slug];
 
   return (
-    <article className="pt-[var(--nav-h)]">
-      <header className="grid-frame pb-16 pt-12 md:pt-20">
+    <article style={accent(disciplineChannel[p.disciplines[0]])} className="pt-[var(--nav-h)]">
+      <header className="grid-frame relative isolate overflow-hidden pb-16 pt-12 md:pt-20">
+        {banner && (
+          <div aria-hidden className="absolute inset-0 -z-10 overflow-hidden">
+            <div data-parallax="0.15" className="absolute inset-x-0 -inset-y-[12%]">
+              <Photo name={banner} lang={lang} sizes="100vw" priority className="h-full w-full object-cover opacity-55" />
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-r from-screen via-screen/80 to-screen/25" />
+            <div className="absolute inset-0 bg-gradient-to-t from-screen via-transparent to-screen/40" />
+          </div>
+        )}
         <Link href={`/${lang}#work`} className="col-span-12 text-sm text-dim hover:text-ink">
           ← {d.caseStudy.back}
         </Link>
@@ -50,6 +63,18 @@ export default async function CaseStudy({ params }: PageProps<"/[lang]/work/[slu
           {subhead && <span className="mt-3 block text-[0.42em] font-semibold leading-tight text-dim">{subhead.trim()}</span>}
         </h1>
         <p data-reveal style={{ "--d": "260ms" } as React.CSSProperties} className="measure col-span-12 mt-8 text-lg leading-snug md:col-span-8">{t(p.subtitle, lang)}</p>
+        <ul data-reveal style={{ "--d": "320ms" } as React.CSSProperties} className="col-span-12 mt-5 flex flex-wrap gap-2 text-xs">
+          {p.disciplines.map((k) => (
+            <li
+              key={k}
+              className="flex items-center gap-1.5 border px-2.5 py-1"
+              style={{ borderColor: `color-mix(in oklab, ${cssVar(disciplineChannel[k])} 55%, transparent)`, color: cssVar(disciplineChannel[k]) }}
+            >
+              <span aria-hidden className="size-1.5 rounded-full" style={{ background: cssVar(disciplineChannel[k]) }} />
+              {t(disciplineLabel[k], lang)}
+            </li>
+          ))}
+        </ul>
 
         <dl data-reveal="line" style={{ "--d": "380ms" } as React.CSSProperties} className="rule-t col-span-12 mt-12 grid grid-cols-2 gap-x-6 gap-y-5 pt-5 text-sm md:grid-cols-4">
           <div>
@@ -72,12 +97,21 @@ export default async function CaseStudy({ params }: PageProps<"/[lang]/work/[slu
             <div className="col-span-2 md:col-span-1">
               <dt className="text-dim">{lang === "pt" ? "Prêmio" : "Award"}</dt>
               <dd className="flex items-start gap-2">
-                <span aria-hidden className="mt-2.5 inline-block h-px w-4 shrink-0 bg-ch1" />
+                <span aria-hidden className="bg-accent mt-2.5 inline-block h-px w-4 shrink-0" />
                 {t(p.award, lang)}
               </dd>
             </div>
           )}
         </dl>
+        {banner && (
+          <p className="col-span-12 mt-6 text-xs text-dim/80">
+            {lang === "pt" ? "Foto ilustrativa de fundo: " : "Illustrative background photo: "}
+            <a href={photos[banner].page} className="link-quiet" target="_blank" rel="noopener">
+              {photos[banner].author}
+            </a>{" "}
+            / Unsplash
+          </p>
+        )}
       </header>
 
       <CaseSection title={d.caseStudy.overview}>
@@ -117,7 +151,7 @@ export default async function CaseStudy({ params }: PageProps<"/[lang]/work/[slu
         <ol className="measure space-y-4">
           {p.approach.map((step, i) => (
             <li key={i} className="grid grid-cols-[2.5rem_1fr]">
-              <span className="tabular text-sm text-dim">{String(i + 1).padStart(2, "0")}</span>
+              <span className="tabular text-accent text-sm">{String(i + 1).padStart(2, "0")}</span>
               <span>{t(step, lang)}</span>
             </li>
           ))}
@@ -147,7 +181,7 @@ export default async function CaseStudy({ params }: PageProps<"/[lang]/work/[slu
           <dl className="mt-10 grid gap-px bg-graticule sm:grid-cols-3">
             {p.metrics.map((m) => (
               <div key={m.value} className="bg-screen py-5 pr-5">
-                <dd className="tabular display condensed text-[clamp(2rem,4vw,3.2rem)]">
+                <dd className="tabular display condensed text-accent text-[clamp(2rem,4vw,3.2rem)] [text-shadow:0_0_24px_color-mix(in_oklab,var(--accent)_40%,transparent)]">
                   {lang === "en" ? m.value.replace(/(\d),(\d)/g, "$1.$2") : m.value}
                 </dd>
                 <dt className="mt-2 text-sm text-dim">{t(m.label, lang)}</dt>
@@ -190,7 +224,7 @@ export default async function CaseStudy({ params }: PageProps<"/[lang]/work/[slu
         <div className="col-span-12 mt-4">
         <Link
           href={`/${lang}/work/${next.slug}`}
-          className="display condensed text-[clamp(2rem,5vw,4.5rem)] font-bold transition-[font-stretch] duration-[var(--dur-slow)] ease-[var(--ease-out-expo)] hover:[font-stretch:96%]"
+          className="display condensed text-[clamp(2rem,5vw,4.5rem)] font-bold transition-[font-stretch,color] duration-[var(--dur-slow)] ease-[var(--ease-out-expo)] hover:text-[var(--accent)] hover:[font-stretch:96%]"
         >
           {next.title.split(":")[0]}
         </Link>
@@ -203,7 +237,10 @@ export default async function CaseStudy({ params }: PageProps<"/[lang]/work/[slu
 function CaseSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section data-reveal="line" className="rule-t grid-frame py-12">
-      <h2 className="col-span-12 mb-4 text-sm text-dim md:col-span-3 md:mb-0">{title}</h2>
+      <h2 className="col-span-12 mb-4 flex items-center gap-2 text-sm text-dim md:col-span-3 md:mb-0">
+        <span aria-hidden className="bg-accent size-1.5 rounded-full" />
+        {title}
+      </h2>
       <div className="col-span-12 md:col-span-9">{children}</div>
     </section>
   );

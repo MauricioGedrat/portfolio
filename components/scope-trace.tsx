@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { damp, prefersReducedMotion } from "@/lib/motion";
+import { getWave, onWave, shape, waveHex, waveLabel, type Wave } from "@/lib/waves";
 
 const W = 1000;
 const H = 560;
@@ -26,15 +27,23 @@ export function ScopeTrace({ className = "" }: { className?: string }) {
     if (!root || !path) return;
 
     const target = { f: 2.2, a: 0.32 };
-    const state = { f: 2.2, a: 0.32, phase: 0 };
+    const state = { f: 2.2, a: 0.32, phase: 0, mix: 1 };
+    let wave: Wave = getWave();
+    let prev: Wave = wave;
+    const paint = () => {
+      const hex = waveHex(wave);
+      path.setAttribute("stroke", hex);
+      path.style.filter = `drop-shadow(0 0 6px ${hex}88)`;
+    };
+    paint();
 
     const draw = () => {
       let d = "";
       for (let i = 0; i <= SAMPLES; i++) {
         const x = i / SAMPLES;
         const w = 2 * Math.PI * state.f * x + state.phase;
-        // Fundamental plus a small 3rd harmonic: a real, slightly imperfect sine.
-        const y = Math.sin(w) + 0.06 * Math.sin(3 * w);
+        // Cross-fade between the previous and the new waveform after a switch.
+        const y = shape(prev, w) * (1 - state.mix) + shape(wave, w) * state.mix;
         const py = H / 2 - y * state.a * (H / 2) * 0.92;
         d += `${i === 0 ? "M" : "L"}${(x * W).toFixed(1)} ${py.toFixed(1)}`;
       }
@@ -42,12 +51,19 @@ export function ScopeTrace({ className = "" }: { className?: string }) {
       if (readout.current) {
         const khz = (state.f * 1.25).toFixed(2);
         const vpp = (state.a * 2 * 4).toFixed(2);
-        readout.current.textContent = `CH1  ${vpp} V   ${khz} kHz`;
+        readout.current.textContent = `${waveLabel(wave)}  ${vpp} V   ${khz} kHz`;
       }
     };
 
     draw();
-    if (prefersReducedMotion()) return;
+    const off = onWave((w) => {
+      prev = wave;
+      wave = w;
+      state.mix = prefersReducedMotion() ? 1 : 0;
+      paint();
+      draw();
+    });
+    if (prefersReducedMotion()) return off;
 
     const onPointer = (e: PointerEvent) => {
       const r = root.getBoundingClientRect();
@@ -66,6 +82,7 @@ export function ScopeTrace({ className = "" }: { className?: string }) {
       state.f = damp(state.f, target.f, 3.5, dt);
       state.a = damp(state.a, target.a, 3.5, dt);
       state.phase -= dt * 1.6;
+      state.mix = Math.min(1, state.mix + dt * 3);
       draw();
       raf = visible ? requestAnimationFrame(tick) : 0;
     };
@@ -82,6 +99,7 @@ export function ScopeTrace({ className = "" }: { className?: string }) {
     raf = requestAnimationFrame(tick);
 
     return () => {
+      off();
       cancelAnimationFrame(raf);
       io.disconnect();
       window.removeEventListener("pointermove", onPointer);
@@ -116,11 +134,11 @@ export function ScopeTrace({ className = "" }: { className?: string }) {
       <path
         ref={trace}
         fill="none"
-        stroke="var(--color-ch1)"
+        stroke="#e8d44d"
         strokeWidth="1.75"
         strokeLinejoin="round"
         vectorEffect="non-scaling-stroke"
-        style={{ filter: "drop-shadow(0 0 6px rgb(232 212 77 / 0.45))" }}
+        className="transition-[stroke] duration-500"
       />
     </svg>
       <p ref={readout} className="tabular absolute bottom-2 right-3 whitespace-pre text-xs text-dim" />

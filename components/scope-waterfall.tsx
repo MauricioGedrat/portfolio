@@ -16,6 +16,7 @@ import { Line2 } from "three/examples/jsm/lines/Line2.js";
 import { LineGeometry } from "three/examples/jsm/lines/LineGeometry.js";
 import { LineMaterial } from "three/examples/jsm/lines/LineMaterial.js";
 import { damp } from "@/lib/motion";
+import { getWave, onWave, shape, waveHex, waveLabel, type Wave } from "@/lib/waves";
 
 // Screen in world units: 10 × 8 divisions, like the 2D scope.
 const HALF_W = 5;
@@ -97,7 +98,7 @@ export function ScopeWaterfall({ onReady }: { onReady?: () => void }) {
     scene.add(new LineSegments(tickGeo, tickMat));
 
     // ── History traces (thin, fading toward the back) ───────────────
-    type Hist = { line: Line; pos: Float32Array; mat: LineBasicMaterial };
+    type Hist = { line: Line; pos: Float32Array; mat: LineBasicMaterial; base: Color };
     const hist: Hist[] = [];
     for (let k = 0; k < HISTORY; k++) {
       const pos = new Float32Array((SAMPLES + 1) * 3);
@@ -108,7 +109,7 @@ export function ScopeWaterfall({ onReady }: { onReady?: () => void }) {
       const line = new Line(geo, mat);
       line.frustumCulled = false;
       scene.add(line);
-      hist.push({ line, pos, mat });
+      hist.push({ line, pos, mat, base: CH1.clone() });
     }
 
     // ── Live trace: a fat line plus a soft wide halo ────────────────
@@ -124,14 +125,24 @@ export function ScopeWaterfall({ onReady }: { onReady?: () => void }) {
 
     // ── Signal model (same feel as the 2D scope) ────────────────────
     const target = { f: 2.2, a: 0.32, px: 0.5, py: 0.5 };
-    const state = { f: 2.2, a: 0.32, phase: 0, px: 0.5, py: 0.5, conv: 0 };
+    const state = { f: 2.2, a: 0.32, phase: 0, px: 0.5, py: 0.5, conv: 0, mix: 1 };
+    let wave: Wave = getWave();
+    let prev: Wave = wave;
+    const liveColor = new Color(waveHex(wave));
+    const targetColor = liveColor.clone();
+    const offWave = onWave((w) => {
+      prev = wave;
+      wave = w;
+      state.mix = 0;
+      targetColor.set(waveHex(w));
+    });
 
     const sample = (out: Float32Array, a: number) => {
       for (let i = 0; i <= SAMPLES; i++) {
         const x = i / SAMPLES;
         const w = 2 * Math.PI * state.f * x + state.phase;
         out[i * 3] = -HALF_W + x * HALF_W * 2;
-        out[i * 3 + 1] = (Math.sin(w) + 0.06 * Math.sin(3 * w)) * a * HALF_H * 0.92;
+        out[i * 3 + 1] = (shape(prev, w) * (1 - state.mix) + shape(wave, w) * state.mix) * a * HALF_H * 0.92;
         out[i * 3 + 2] = 0;
       }
     };
@@ -181,6 +192,10 @@ export function ScopeWaterfall({ onReady }: { onReady?: () => void }) {
       state.px = damp(state.px, target.px, 2.5, dt);
       state.py = damp(state.py, target.py, 2.5, dt);
       state.phase -= dt * 1.6;
+      state.mix = Math.min(1, state.mix + dt * 2.5);
+      liveColor.lerp(targetColor, Math.min(1, dt * 6));
+      liveMat.color.copy(liveColor);
+      haloMat.color.copy(liveColor);
 
       const amp = state.a * (1 - state.conv);
       sample(live, amp);
@@ -190,6 +205,7 @@ export function ScopeWaterfall({ onReady }: { onReady?: () => void }) {
         lastSnap = now;
         const oldest = hist.pop()!;
         oldest.pos.set(live);
+        oldest.base.copy(liveColor);
         (oldest.line.geometry.getAttribute("position") as BufferAttribute).needsUpdate = true;
         hist.unshift(oldest);
       }
@@ -200,7 +216,7 @@ export function ScopeWaterfall({ onReady }: { onReady?: () => void }) {
         const h = hist[k];
         const t = (k + frac) / HISTORY;
         h.line.position.z = -(k + 1 + frac) * spacing;
-        h.mat.color.copy(CH1).lerp(RULE, Math.min(1, t * 1.25));
+        h.mat.color.copy(h.base).lerp(RULE, Math.min(1, t * 1.15));
         h.mat.opacity = Math.pow(1 - t, 1.6) * 0.7;
       }
 
@@ -213,7 +229,7 @@ export function ScopeWaterfall({ onReady }: { onReady?: () => void }) {
       if (readout.current) {
         const khz = (state.f * 1.25).toFixed(2);
         const vpp = (amp * 2 * 4).toFixed(2);
-        readout.current.textContent = `CH1  ${vpp} V   ${khz} kHz`;
+        readout.current.textContent = `${waveLabel(wave)}  ${vpp} V   ${khz} kHz`;
       }
       if (!ready) {
         ready = true;
@@ -242,6 +258,7 @@ export function ScopeWaterfall({ onReady }: { onReady?: () => void }) {
     raf = requestAnimationFrame(frame);
 
     return () => {
+      offWave();
       cancelAnimationFrame(raf);
       io.disconnect();
       ro.disconnect();

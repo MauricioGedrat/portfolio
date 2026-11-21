@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { Dictionary, Locale } from "@/lib/i18n";
 import { sectionNumber, sections, type SectionId } from "@/lib/sections";
+import { cssVar, sectionChannel } from "@/lib/accent";
 import { LocaleSwitch } from "./locale-switch";
 
 /**
@@ -94,12 +95,15 @@ export function Nav({ lang, d }: { lang: Locale; d: Dictionary }) {
                       isActive ? "text-ink" : "text-dim hover:text-ink"
                     }`}
                   >
-                    <span className="tabular text-xs text-dim">{sectionNumber(id)}</span>
+                    <span className="tabular text-xs transition-colors" style={{ color: isActive ? cssVar(sectionChannel[id]) : undefined }}>
+                      {sectionNumber(id)}
+                    </span>
                     {d.nav.sections[id]}
                     <span
                       aria-hidden
-                      className={`absolute inset-x-0 -bottom-px h-px origin-left bg-ch1 transition-transform duration-[var(--dur-base)] ease-[var(--ease-out-expo)] ${
-                        isActive ? "scale-x-100" : "scale-x-0"
+                      style={{ background: cssVar(sectionChannel[id]) }}
+                      className={`absolute inset-x-0 -bottom-px h-px origin-left transition-transform duration-[var(--dur-base)] ease-[var(--ease-out-expo)] ${
+                        isActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-50"
                       }`}
                     />
                   </a>
@@ -124,6 +128,17 @@ export function Nav({ lang, d }: { lang: Locale; d: Dictionary }) {
         </div>
       </div>
 
+      {/* Sweep: how far down the page you are, in the colour of the section in view. */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 -bottom-px h-[2px] origin-left transition-[background-color] duration-[var(--dur-slow)]"
+        style={{
+          transform: "scaleX(var(--progress, 0))",
+          background: active ? cssVar(sectionChannel[active]) : "var(--color-ch1)",
+          boxShadow: `0 0 8px ${active ? cssVar(sectionChannel[active]) : "var(--color-ch1)"}`,
+        }}
+      />
+
       {open && (
         <nav
           id="nav-sheet"
@@ -138,7 +153,9 @@ export function Nav({ lang, d }: { lang: Locale; d: Dictionary }) {
                   onClick={() => setOpen(false)}
                   className="flex items-baseline gap-4 py-4 text-xl font-semibold condensed"
                 >
-                  <span className="tabular text-sm font-normal text-dim">{sectionNumber(id)}</span>
+                  <span className="tabular text-sm font-normal" style={{ color: cssVar(sectionChannel[id]) }}>
+                    {sectionNumber(id)}
+                  </span>
                   {d.nav.sections[id]}
                 </a>
               </li>

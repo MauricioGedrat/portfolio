@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import "../globals.css";
 import { Analytics } from "@/components/analytics";
 import { RevealObserver } from "@/components/reveal-observer";
+import { ScrollFx } from "@/components/scroll-fx";
 import { revealBootScript } from "@/lib/reveal-boot";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
@@ -58,6 +59,7 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
       </head>
       <body className="font-sans">
         <RevealObserver />
+        <ScrollFx />
         <Analytics />
         <a
           data-print-hide

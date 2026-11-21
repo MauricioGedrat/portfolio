@@ -42,11 +42,11 @@ export function LiveChain({ nodes, lang }: { nodes: ChainNode[]; lang: Locale })
       <div aria-hidden className="relative mb-px hidden h-3 md:block">
         <div className="absolute inset-x-0 top-1/2 h-px bg-graticule" />
         <div
-          className="absolute top-1/2 h-px bg-ch1/60 transition-[width] ease-linear"
+          className="bg-accent absolute top-1/2 h-px opacity-60 transition-[width] ease-linear"
           style={{ width: `${(probeX / n) * 100}%`, transitionDuration: shown === 0 ? "0ms" : `${STEP_MS}ms` }}
         />
         <div
-          className="absolute top-1/2 size-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-ch1 shadow-[0_0_10px_2px_rgb(232_212_77/0.45)] transition-[left,opacity] ease-linear"
+          className="bg-accent absolute top-1/2 size-2 -translate-x-1/2 -translate-y-1/2 rounded-full shadow-[0_0_10px_2px_var(--accent)] transition-[left,opacity] ease-linear"
           style={{
             left: `${(probeX / n) * 100}%`,
             opacity: shown < 0 || shown >= n ? 0 : 1,
@@ -67,11 +67,11 @@ export function LiveChain({ nodes, lang }: { nodes: ChainNode[]; lang: Locale })
             >
               <span
                 aria-hidden
-                className={`absolute inset-x-0 top-0 h-0.5 origin-left bg-ch1 transition-transform duration-[var(--dur-base)] ease-[var(--ease-out-expo)] ${
+                className={`bg-accent absolute inset-x-0 top-0 h-0.5 origin-left transition-transform duration-[var(--dur-base)] ease-[var(--ease-out-expo)] ${
                   lit ? "scale-x-100" : "scale-x-0"
                 }`}
               />
-              <span className={`tabular text-xs transition-colors ${lit ? "text-ch1" : "text-dim"}`}>
+              <span className={`tabular text-xs transition-colors ${lit ? "text-accent" : "text-dim"}`}>
                 {String(i + 1).padStart(2, "0")}
               </span>
               <p
