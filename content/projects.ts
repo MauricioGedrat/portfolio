@@ -296,7 +296,7 @@ export const projects: Project[] = [
     metrics: [
       { value: "0,59%", label: { pt: "incerteza total", en: "total uncertainty" } },
       { value: "10 mV/°C", label: { pt: "escala de saída", en: "output scale" } },
-      { value: "−10–120 °C", label: { pt: "faixa medida", en: "measured range" } },
+      { value: "−10–120 °C", label: { pt: "faixa de projeto", en: "design range" } },
     ],
     technologies: ["INA128", "LM35", "TL071", "Instrumentation", "Calibration"],
     sources: [],
@@ -444,8 +444,84 @@ export const projects: Project[] = [
     sources: [],
   },
   {
-    slug: "sensor-temperatura-diodo",
+    slug: "gerador-cd4069",
     order: 5,
+    featured: false,
+    confidence: "verified",
+    title: "Gerador de funções com um único CD4069",
+    subtitle: {
+      pt: "Quadrada, triangular e senoide ao mesmo tempo, com um CI de seis inversores em 5 V",
+      en: "Square, triangle and sine at once, from one six-inverter chip on 5 V",
+    },
+    year: 2026,
+    disciplines: ["electronics"],
+    collaborators: ["Leonardo Kohn"],
+    context: {
+      pt: "Tarefa prática, Técnico em Eletrônica — Fundação Liberato",
+      en: "Lab assignment, Electronics Technician course — Fundação Liberato",
+    },
+    summary: {
+      pt: "Um gerador de três saídas simultâneas feito com um só CI CMOS, o CD4069UB, alimentado em 5 V. Identificamos a topologia, deduzimos a equação da frequência e conferimos o modelo no osciloscópio.",
+      en: "A three-output generator built from a single CMOS chip, the CD4069UB, on 5 V. We identified the topology, derived the frequency equation and checked the model on the oscilloscope.",
+    },
+    problem: {
+      pt: "Entender e documentar um circuito recebido só como esquemático. A fórmula que costuma aparecer para osciladores com inversores, f = 1/(2,2RC), não vale para este circuito.",
+      en: "Understand and document a circuit handed over only as a schematic. The formula usually quoted for inverter oscillators, f = 1/(2.2RC), does not apply to this circuit.",
+    },
+    approach: [
+      {
+        pt: "Identificar a topologia: um integrador de Miller (U1:A) e um comparador com histerese feito com dois inversores (U1:B e U1:C) formam um oscilador de relaxação. O U1:F conforma a senoide.",
+        en: "Identify the topology: a Miller integrator (U1:A) and a hysteresis comparator made of two inverters (U1:B and U1:C) form a relaxation oscillator. U1:F shapes the sine.",
+      },
+      {
+        pt: "Deduzir a frequência por superposição: f = R2 / (4·R1·R·C). A tensão de alimentação se cancela na conta, então a frequência não depende do VCC.",
+        en: "Derive the frequency by superposition: f = R2 / (4·R1·R·C). The supply voltage cancels out, so the frequency does not depend on VCC.",
+      },
+      {
+        pt: "Medir os resistores reais (R1 = 9,97 kΩ e R2 = 27,4 kΩ) e usar esses valores, em vez dos nominais, em todos os cálculos.",
+        en: "Measure the real resistors (R1 = 9.97 kΩ and R2 = 27.4 kΩ) and use those values, not the nominal ones, in every calculation.",
+      },
+      {
+        pt: "Capturar as três saídas ao mesmo tempo no osciloscópio e comparar calculado com medido.",
+        en: "Capture all three outputs at once on the oscilloscope and compare calculated against measured.",
+      },
+    ],
+    chain: [
+      { id: "int", label: { pt: "Integrador", en: "Integrator" }, detail: { pt: "U1:A · triangular", en: "U1:A · triangle" } },
+      { id: "cmp", label: { pt: "Comparador", en: "Comparator" }, detail: { pt: "U1:B + C · quadrada", en: "U1:B + C · square" } },
+      { id: "sin", label: { pt: "Conformador", en: "Shaper" }, detail: { pt: "U1:F · senoide", en: "U1:F · sine" } },
+      { id: "lim", label: { pt: "Acoplamento", en: "Coupling" }, detail: { pt: "limitador", en: "limiter" } },
+      { id: "scope", label: { pt: "Osciloscópio", en: "Oscilloscope" }, detail: { pt: "3 canais", en: "3 channels" } },
+    ],
+    implementation: [
+      {
+        pt: "Montado em protoboard com C1 = 1,5 nF. A faixa baixa (chave S1 e C2) ficou prevista no projeto, mas não foi montada.",
+        en: "Built on a breadboard with C1 = 1.5 nF. The low range (switch S1 and C2) is in the design but was not built.",
+      },
+      {
+        pt: "RV1, RV2 e RV3 ajustam frequência, simetria e distorção da senoide.",
+        en: "RV1, RV2 and RV3 set the frequency, symmetry and sine distortion.",
+      },
+    ],
+    result: {
+      pt: "As três saídas funcionaram juntas de 6,39 kHz a 107,0 kHz, com frequências coerentes com a equação deduzida. A amplitude da triangular ficou acima do previsto (+28,3 % em 6,39 kHz e +14,2 % em 107,0 kHz). O relatório registra esse desvio e lista três hipóteses para ele, em vez de forçar uma explicação.",
+      en: "All three outputs worked together from 6.39 kHz to 107.0 kHz, with frequencies consistent with the derived equation. The triangle's amplitude came out higher than predicted (+28.3 % at 6.39 kHz and +14.2 % at 107.0 kHz). The report records the deviation and lists three hypotheses for it instead of forcing one explanation.",
+    },
+    metrics: [
+      { value: "1 CI", label: { pt: "seis inversores, três saídas", en: "six inverters, three outputs" } },
+      { value: "107,0 kHz", label: { pt: "maior captura com as três saídas juntas", en: "highest capture with all three outputs" } },
+      { value: "5 V", label: { pt: "alimentação única", en: "single supply" } },
+    ],
+    lessons: {
+      pt: "A amplitude da triangular errou, mas a frequência não: a excursão da onda se cancela na dedução do período. Separar o que o modelo prevê bem do que ele não prevê foi mais útil do que tentar fechar todos os números.",
+      en: "The triangle's amplitude was off, but the frequency wasn't: the wave's swing cancels out in the period derivation. Separating what the model predicts well from what it doesn't was more useful than trying to make every number match.",
+    },
+    technologies: ["CD4069UB", "CMOS", "Relaxation oscillator", "Oscilloscope"],
+    sources: [],
+  },
+  {
+    slug: "sensor-temperatura-diodo",
+    order: 6,
     featured: false,
     confidence: "verified",
     title: "Diodo como sensor de temperatura",
@@ -497,7 +573,7 @@ export const projects: Project[] = [
   },
   {
     slug: "eletronica-de-potencia",
-    order: 6,
+    order: 7,
     featured: false,
     confidence: "verified",
     title: "Práticas de Eletrônica de Potência",

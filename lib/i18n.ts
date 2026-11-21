@@ -83,8 +83,8 @@ const dictionary = {
   lab: {
     title: { pt: "Lab", en: "Lab" },
     intro: {
-      pt: "Bancada virtual do gerador de funções: mexa nos potenciômetros e veja a onda e as harmônicas mudarem.",
-      en: "A virtual bench for the function generator: turn the pots and watch the wave and its harmonics change.",
+      pt: "Três projetos para mexer direto no navegador: o gerador de funções, o controle do carrinho e o condicionador de termopar, todos com os valores reais de cada trabalho.",
+      en: "Three projects to play with right in the browser: the function generator, the car remote and the thermocouple conditioner, each using the real values from the project.",
     },
   },
   experience: { title: { pt: "Trajetória", en: "Experience" } },

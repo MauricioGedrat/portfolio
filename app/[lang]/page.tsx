@@ -4,7 +4,7 @@ import { ContactForm } from "@/components/contact-form";
 import { HeroName } from "@/components/hero-name";
 import { HeroScope } from "@/components/hero-scope";
 import { HeroWaveSwitch } from "@/components/hero-wave-switch";
-import { LabGenerator } from "@/components/lab-generator";
+import { LabTabs } from "@/components/lab/lab-tabs";
 import { PcbPulse } from "@/components/pcb-pulse";
 import { ScopeTrace } from "@/components/scope-trace";
 import { SectionHeading } from "@/components/section-heading";
@@ -161,7 +161,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
           <div className="absolute inset-0 bg-gradient-to-r from-screen via-screen/60 to-transparent" />
         </div>
         <SectionHeading id="lab" title={d.lab.title} intro={d.lab.intro} />
-        <LabGenerator lang={lang} />
+        <LabTabs lang={lang} />
       </section>
 
       {/* ───────────── 04 Experience ───────────── */}

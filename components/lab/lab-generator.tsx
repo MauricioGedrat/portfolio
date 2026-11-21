@@ -181,7 +181,7 @@ export function LabGenerator({ lang }: { lang: Locale }) {
   const db = h.map((v) => (h[0] > 0 && v > 0 ? 20 * Math.log10(v / h[0]) : -80));
 
   return (
-    <div className="col-span-12 mt-10 grid grid-cols-12 gap-x-[var(--gutter)] gap-y-10 md:col-span-11 md:col-start-2">
+    <div className="grid grid-cols-12 gap-x-[var(--gutter)] gap-y-10">
       <form className="col-span-12 space-y-7 text-sm lg:col-span-4" onSubmit={(e) => e.preventDefault()}>
         <fieldset>
           <legend className="text-dim">{c.wave}</legend>

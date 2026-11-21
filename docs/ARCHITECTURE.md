@@ -71,8 +71,11 @@ Ordem dos projetos (por importância):
 2. Carrinho Web Bluetooth — Next.js + ESP32 + BLE (com Matheus Bizarro)
 3. Condicionador de termopar tipo K — INA128, compensação de junta fria
 4. Gerador de funções — LM311 + LM324
-5. Sensor de temperatura com diodo (não destacado)
-6. Laboratórios de eletrônica de potência (não destacado)
+5. Gerador de funções com um único CD4069 (com Leonardo Kohn, não destacado)
+6. Sensor de temperatura com diodo (não destacado)
+7. Laboratórios de eletrônica de potência (não destacado)
+
+Fica para depois: controlador fuzzy com ESP32 (entra quando estiver concluído).
 
 CSG Freeflow aparece só na linha do tempo (experiência), sem estudo de caso.
 
@@ -141,6 +144,7 @@ Eventos: `page_view`, `project_view`, `resume_download`, `contact_click`, `cta_c
 | 4 | Título que "viaja" da lista para o estudo de caso (View Transitions), cadeia de sinal com sonda animada | feito |
 | 5 | Linha do tempo com trilho que acende ao rolar; habilidades apontam os projetos que as usam | feito |
 | 6 | Lab: bancada virtual do gerador de funções (osciloscópio, FFT, THD, slew-rate do LM324) | feito |
+| 6b | Lab em abas (`components/lab/`): + controle do carrinho (mesmo protocolo F/B/S, L/R/C, 1/2/3, H/h e PWM do firmware; estado TX de 4 letras, tabela da L298N, LEDs) e condicionador de termopar K (polinômio NIST ITS-90, ganho 201,8, saída 10 mV/°C, erro × limite de 2 %) | feito |
 | 7 | /resume a partir dos mesmos dados, com versão de impressão; PDFs oficiais continuam para download | feito |
 | 8 | Formulário de contato → Supabase (honeypot, tempo mínimo, 5/dia por visitante); mensagens no /insights | feito |
 | 9–11 | /studio: edição dos textos dos projetos (PT/EN), ordem, destaque e ocultar; updateTag atualiza o site | feito |

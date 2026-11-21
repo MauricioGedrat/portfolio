@@ -36,6 +36,7 @@ export const projectBanner: Record<string, PhotoKey> = {
   "carrinho-web-bluetooth": "code",
   "condicionador-termopar-k": "tealPcb",
   "gerador-de-funcoes": "rainbowSine",
+  "gerador-cd4069": "goldPcb",
   "sensor-temperatura-diodo": "redPcb",
   "eletronica-de-potencia": "streaks",
 };
