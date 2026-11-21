@@ -1,26 +1,134 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
+/*
+ * Design tokens — "oscilloscope" system.
+ * The palette comes from the instrument Maurício measures with: a graphite
+ * screen, a faint graticule, phosphor-white text and channel 1's yellow,
+ * which is reserved for live signal and the active state. Nothing else is
+ * yellow.
+ */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@theme {
+  --color-screen: #0f1215;
+  --color-panel: #151a1e;
+  --color-graticule: #262c32;
+  --color-rule: #343b42;
+  --color-ink: #e6e8e3;
+  --color-dim: #8b939a;
+  --color-ch1: #e8d44d;
+  --color-danger: #f0846e;
+
+  /* Type scale — perfect fourth (1.333), body 17px. */
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1.1rem;
+  --text-sm: 0.8125rem;
+  --text-sm--line-height: 1.25rem;
+  --text-base: 1.0625rem;
+  --text-base--line-height: 1.65rem;
+  --text-lg: 1.4167rem;
+  --text-lg--line-height: 1.9rem;
+  --text-xl: 1.8889rem;
+  --text-xl--line-height: 2.3rem;
+  --text-2xl: 2.5185rem;
+  --text-2xl--line-height: 2.8rem;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+
+  --breakpoint-xs: 26rem;
+}
+
+:root {
+  --gutter: clamp(1rem, 4vw, 3rem);
+  --nav-h: 3.5rem;
+  --dur-fast: 160ms;
+  --dur-base: 320ms;
+  --dur-slow: 700ms;
+  color-scheme: dark;
+}
+
+@layer base {
+  html {
+    background: var(--color-screen);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-stretch: 100%;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
+    scroll-padding-top: calc(var(--nav-h) + 1rem);
+  }
+  body {
+    min-height: 100dvh;
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+    font-feature-settings: "tnum" 0, "ss01" 1;
+  }
+  ::selection {
+    background: var(--color-ch1);
+    color: var(--color-screen);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-ch1);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+  a {
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  /* Shared 12-column grid with a fluid gutter. */
+  .grid-frame {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--gutter);
+    padding-inline: var(--gutter);
+    max-width: 96rem;
+    margin-inline: auto;
+  }
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+  /* Display type: the width axis is part of the identity. */
+  .display {
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    line-height: 0.86;
+  }
+  .condensed {
+    font-stretch: 72%;
+  }
+  .expanded {
+    font-stretch: 118%;
+  }
+  .measure {
+    max-width: 62ch;
+  }
+  .link-quiet {
+    text-decoration: underline;
+    text-decoration-color: var(--color-rule);
+    transition: text-decoration-color var(--dur-fast) ease;
+  }
+  .link-quiet:hover {
+    text-decoration-color: var(--color-ch1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
 }
