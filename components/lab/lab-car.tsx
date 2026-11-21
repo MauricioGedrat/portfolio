@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import type { Locale } from "@/content/types";
 import { CH } from "@/lib/accent";
+import { drawCity, drawMinimap, hits, START, TARGET, WORLD_H, WORLD_W } from "./car-city";
 
 // Same letters and PWM values as firmware/carrinho_web.ino
 type Mov = "F" | "B" | "S";
@@ -13,8 +14,10 @@ const VEL_FRENTE = [140, 190, 255];
 const VEL_RE = 170;
 const VEL_DIRECAO = 200;
 const TEMPO_PISCA = 400; // ms
+const SPEED = 220; // px/s at 100 % duty (simulation scale)
 
 type State = { mov: Mov; vel: 1 | 2 | 3; dir: Dir; farol: boolean };
+type Evt = "crash" | "parked" | null;
 
 const copy = {
   pt: {
@@ -24,16 +27,18 @@ const copy = {
     right: "Direita",
     speed: "Velocidade",
     light: "Farol",
-    keys: "Clique na pista e use as setas ou WASD, 1/2/3 e H.",
+    keys: "Clique na cidade e use as setas ou WASD, 1/2/3 e H.",
+    crash: "Bateu! Dê ré para sair.",
+    parked: "Estacionou certinho na vaga.",
     tx: "Estado que o ESP32 devolve (TX)",
     rx: "Letras enviadas ao ESP32 (RX)",
     driver: "Ponte H L298N",
     leds: "LEDs",
     ledNames: { farol: "farol", esq: "pisca esq.", dir: "pisca dir.", freio: "freio" },
     status: (s: State) => (s.mov === "F" ? `Andando para frente na velocidade ${s.vel}` : s.mov === "B" ? "Dando ré" : "Parado, com freio"),
-    note: "Simulação no navegador com o mesmo protocolo e os mesmos valores de PWM do firmware do carrinho. Ao sair da página ou trocar de aba, ele para, como o real.",
+    note: "A cidade é fictícia, mas o protocolo e os valores de PWM são os mesmos do firmware do carrinho. Tem uma vaga livre no estacionamento, marcada em verde no minimapa, para treinar. Ao sair da página ou trocar de aba, ele para, como o real.",
     see: "Ver o projeto real",
-    arena: "Pista do carrinho simulado",
+    arena: "Cidadezinha do carrinho simulado",
   },
   en: {
     forward: "Forward",
@@ -42,16 +47,18 @@ const copy = {
     right: "Right",
     speed: "Speed",
     light: "Headlight",
-    keys: "Click the track, then use the arrows or WASD, 1/2/3 and H.",
+    keys: "Click the town, then use the arrows or WASD, 1/2/3 and H.",
+    crash: "Bumped into something. Back up to get out.",
+    parked: "Parked right in the spot.",
     tx: "State the ESP32 sends back (TX)",
     rx: "Letters sent to the ESP32 (RX)",
     driver: "L298N H-bridge",
     leds: "LEDs",
     ledNames: { farol: "headlight", esq: "left blink", dir: "right blink", freio: "brake" },
     status: (s: State) => (s.mov === "F" ? `Driving forward at speed ${s.vel}` : s.mov === "B" ? "Reversing" : "Stopped, braking"),
-    note: "A browser simulation using the same protocol and PWM values as the car's firmware. Leaving the page or switching tabs stops it, like the real one.",
+    note: "The town is made up, but the protocol and PWM values are the same as the car's firmware. There's a free spot in the parking lot, marked in green on the minimap, to practise. Leaving the page or switching tabs stops it, like the real one.",
     see: "See the real project",
-    arena: "Simulated car track",
+    arena: "Little town for the simulated car",
   },
 };
 
@@ -63,6 +70,8 @@ export function LabCar({ lang }: { lang: Locale }) {
   const [st, setSt] = useState<State>({ mov: "S", vel: 1, dir: "C", farol: false });
   const [log, setLog] = useState<string[]>([]);
   const [blink, setBlink] = useState(false);
+  const [evt, setEvt] = useState<Evt>(null);
+  const evtRef = useRef<Evt>(null);
   const stRef = useRef(st);
   useLayoutEffect(() => {
     stRef.current = st;
@@ -118,45 +127,80 @@ export function LabCar({ lang }: { lang: Locale }) {
     return () => clearInterval(id);
   }, [st.dir]);
 
-  // Car physics + drawing
+  // Car physics, camera and drawing over the little town
   useEffect(() => {
     const cv = canvas.current;
     if (!cv) return;
     const g = cv.getContext("2d")!;
-    const car = { x: 0.5, y: 0.62, h: -Math.PI / 2, v: 0, steer: 0 };
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const zoomFor = (w: number) => Math.max(0.5, Math.min(1, w / 760));
+
+    // the town is drawn once to an offscreen canvas; each frame only copies the visible part
+    const scale = Math.min(1.5, Math.max(1, dpr * zoomFor(cv.clientWidth)));
+    const city = document.createElement("canvas");
+    city.width = Math.round(WORLD_W * scale);
+    city.height = Math.round(WORLD_H * scale);
+    const cg = city.getContext("2d")!;
+    cg.scale(scale, scale);
+    drawCity(cg);
+    const MW = 120;
+    const MH = (MW * WORLD_H) / WORLD_W;
+    const mini = document.createElement("canvas");
+    mini.width = Math.round(MW * dpr);
+    mini.height = Math.round(MH * dpr);
+    const mg = mini.getContext("2d")!;
+    mg.scale(dpr, dpr);
+    drawMinimap(mg, MW, MH);
+
+    const car = { x: START.x, y: START.y, h: START.h, v: 0, steer: 0 };
+    const cam = { x: car.x, y: car.y };
     const trail: { x: number; y: number }[] = [];
+    let crashAt = -1e9;
+    let blocked = false;
     let raf = 0;
     let last = performance.now();
     let blinkOn = false;
     let blinkT = 0;
+    let visible = true;
+    const io = new IntersectionObserver(([e]) => (visible = e.isIntersecting));
+    io.observe(cv);
 
     const frame = (now: number) => {
       const dt = Math.min((now - last) / 1000, 0.05);
       last = now;
+      raf = requestAnimationFrame(frame);
+      if (!visible) return;
       const s = stRef.current;
       const W = cv.clientWidth;
       const H = cv.clientHeight;
-      if (cv.width !== Math.round(W * devicePixelRatio)) {
-        cv.width = Math.round(W * devicePixelRatio);
-        cv.height = Math.round(H * devicePixelRatio);
+      if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) {
+        cv.width = Math.round(W * dpr);
+        cv.height = Math.round(H * dpr);
       }
-      g.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+      const z = zoomFor(W);
 
-      // duty cycle → target speed (fraction of the track per second)
+      // duty cycle → speed (px/s); the L298N brake stops it faster than coasting
       const duty = s.mov === "F" ? VEL_FRENTE[s.vel - 1] / 255 : s.mov === "B" ? -VEL_RE / 255 : 0;
-      const target = duty * 0.32;
-      const k = s.mov === "S" ? 9 : 2.5; // the L298N brake stops it faster than coasting
-      car.v += (target - car.v) * Math.min(1, dt * k);
-      const steerTarget = s.dir === "L" ? -0.45 : s.dir === "R" ? 0.45 : 0;
+      car.v += (duty * SPEED - car.v) * Math.min(1, dt * (s.mov === "S" ? 9 : 2.5));
+      const steerTarget = s.dir === "L" ? -0.6 : s.dir === "R" ? 0.6 : 0;
       car.steer += (steerTarget - car.steer) * Math.min(1, dt * 8);
-      car.h += (car.v / 0.08) * Math.tan(car.steer) * dt;
-      car.x += Math.cos(car.h) * car.v * dt * (H / W);
-      car.y += Math.sin(car.h) * car.v * dt;
-      car.x = (car.x + 1) % 1;
-      car.y = (car.y + 1) % 1;
-      if (Math.abs(car.v) > 0.01) {
+      const nh = car.h + (car.v / 32) * Math.tan(car.steer) * dt;
+      const nx = car.x + Math.cos(nh) * car.v * dt;
+      const ny = car.y + Math.sin(nh) * car.v * dt;
+      if (hits(nx, ny, nh)) {
+        if (Math.abs(car.v) > 30) crashAt = now;
+        car.v = 0;
+        blocked = true;
+      } else {
+        blocked = false;
+        car.x = nx;
+        car.y = ny;
+        car.h = nh;
+      }
+      const lt = trail[trail.length - 1];
+      if (!lt || Math.hypot(lt.x - car.x, lt.y - car.y) > 4) {
         trail.push({ x: car.x, y: car.y });
-        if (trail.length > 240) trail.shift();
+        if (trail.length > 500) trail.shift();
       }
       blinkT += dt * 1000;
       if (blinkT >= TEMPO_PISCA) {
@@ -164,56 +208,75 @@ export function LabCar({ lang }: { lang: Locale }) {
         blinkOn = !blinkOn;
       }
 
-      // floor
-      g.clearRect(0, 0, W, H);
-      g.strokeStyle = "#1d2328";
-      g.lineWidth = 1;
-      const step = 32;
-      for (let x = 0; x < W; x += step) {
-        g.beginPath();
-        g.moveTo(x + 0.5, 0);
-        g.lineTo(x + 0.5, H);
-        g.stroke();
+      // events shown in the overlay (only touch React state when they change)
+      const parked =
+        car.x > TARGET.x && car.x < TARGET.x + TARGET.w && car.y > TARGET.y && car.y < TARGET.y + TARGET.h && Math.abs(Math.cos(car.h)) < 0.4 && Math.abs(car.v) < 4;
+      const e: Evt = blocked || now - crashAt < 1400 ? "crash" : parked ? "parked" : null;
+      if (e !== evtRef.current) {
+        evtRef.current = e;
+        setEvt(e);
       }
-      for (let y = 0; y < H; y += step) {
-        g.beginPath();
-        g.moveTo(0, y + 0.5);
-        g.lineTo(W, y + 0.5);
-        g.stroke();
-      }
+
+      // camera follows the car, clamped to the town
+      const vw = W / z;
+      const vh = H / z;
+      const k = Math.min(1, dt * 5);
+      cam.x += (car.x - cam.x) * k;
+      cam.y += (car.y - cam.y) * k;
+      const sx = Math.min(Math.max(cam.x - vw / 2, 0), WORLD_W - vw);
+      const sy = Math.min(Math.max(cam.y - vh / 2, 0), WORLD_H - vh);
+      g.setTransform(dpr, 0, 0, dpr, 0, 0);
+      g.drawImage(city, sx * scale, sy * scale, vw * scale, vh * scale, 0, 0, W, H);
+
+      g.save();
+      g.scale(z, z);
+      g.translate(-sx, -sy);
+      // the free parking spot, pulsing
+      const pulse = parked ? 1 : 0.5 + 0.5 * Math.sin(now / 300);
+      g.fillStyle = `rgba(95,214,144,${parked ? 0.28 : 0.08 + pulse * 0.1})`;
+      g.fillRect(TARGET.x + 3, TARGET.y + 3, TARGET.w - 6, TARGET.h - 6);
+      g.strokeStyle = `rgba(95,214,144,${0.45 + pulse * 0.45})`;
+      g.lineWidth = 2;
+      g.setLineDash([6, 5]);
+      g.strokeRect(TARGET.x + 3, TARGET.y + 3, TARGET.w - 6, TARGET.h - 6);
+      g.setLineDash([]);
       // trail
+      g.lineWidth = 2;
       for (let i = 1; i < trail.length; i++) {
         const a = trail[i - 1];
         const b = trail[i];
-        if (Math.abs(a.x - b.x) > 0.5 || Math.abs(a.y - b.y) > 0.5) continue;
-        g.strokeStyle = `rgba(95, 214, 144, ${(i / trail.length) * 0.5})`;
-        g.lineWidth = 2;
+        g.strokeStyle = `rgba(95, 214, 144, ${(i / trail.length) * 0.45})`;
         g.beginPath();
-        g.moveTo(a.x * W, a.y * H);
-        g.lineTo(b.x * W, b.y * H);
+        g.moveTo(a.x, a.y);
+        g.lineTo(b.x, b.y);
         g.stroke();
       }
 
-      // car (top view): 44 × 26 px body
-      g.save();
-      g.translate(car.x * W, car.y * H);
+      // car (top view): 46 × 26 px body
+      g.translate(car.x, car.y);
       g.rotate(car.h);
       const L = 46;
       const Wd = 26;
       if (s.farol) {
-        const beam = g.createLinearGradient(L / 2, 0, L / 2 + 120, 0);
-        beam.addColorStop(0, "rgba(232,212,77,0.45)");
+        g.save();
+        g.globalCompositeOperation = "lighter";
+        const beam = g.createLinearGradient(L / 2, 0, L / 2 + 150, 0);
+        beam.addColorStop(0, "rgba(232,212,77,0.42)");
         beam.addColorStop(1, "rgba(232,212,77,0)");
         g.fillStyle = beam;
         g.beginPath();
         g.moveTo(L / 2, -Wd / 2 + 3);
-        g.lineTo(L / 2 + 120, -Wd / 2 - 34);
-        g.lineTo(L / 2 + 120, Wd / 2 + 34);
+        g.lineTo(L / 2 + 150, -Wd / 2 - 42);
+        g.lineTo(L / 2 + 150, Wd / 2 + 42);
         g.lineTo(L / 2, Wd / 2 - 3);
         g.closePath();
         g.fill();
+        g.restore();
       }
-      // wheels
+      g.fillStyle = "rgba(0,0,0,0.5)";
+      g.beginPath();
+      g.roundRect(-L / 2 + 3, -Wd / 2 + 6, L, Wd - 4, 6);
+      g.fill();
       g.fillStyle = "#0b0d0f";
       const wheel = (x: number, y: number, rot: number) => {
         g.save();
@@ -226,14 +289,12 @@ export function LabCar({ lang }: { lang: Locale }) {
       wheel(-L / 2 + 9, Wd / 2, 0);
       wheel(L / 2 - 9, -Wd / 2, car.steer);
       wheel(L / 2 - 9, Wd / 2, car.steer);
-      // body
       g.fillStyle = "#e6e8e3";
       g.beginPath();
       g.roundRect(-L / 2, -Wd / 2 + 2, L, Wd - 4, 6);
       g.fill();
       g.fillStyle = "#151a1e";
       g.fillRect(-6, -Wd / 2 + 6, 16, Wd - 12);
-      // lights
       const dot = (x: number, y: number, color: string, on: boolean) => {
         g.fillStyle = on ? color : "#3a4148";
         g.shadowColor = on ? color : "transparent";
@@ -252,10 +313,30 @@ export function LabCar({ lang }: { lang: Locale }) {
       dot(4, Wd / 2 - 2, "#ec9a5f", s.dir === "R" && blinkOn);
       g.restore();
 
-      raf = requestAnimationFrame(frame);
+      // minimap with the visible area and the car
+      const mw = Math.min(MW, W * 0.3);
+      const mh = (mw * WORLD_H) / WORLD_W;
+      const m = mw / WORLD_W;
+      const mx = W - mw - 10;
+      const my = 10;
+      g.globalAlpha = 0.92;
+      g.drawImage(mini, mx, my, mw, mh);
+      g.globalAlpha = 1;
+      g.strokeStyle = "rgba(230,232,227,0.25)";
+      g.lineWidth = 1;
+      g.strokeRect(mx + 0.5, my + 0.5, mw - 1, mh - 1);
+      g.strokeStyle = "rgba(230,232,227,0.6)";
+      g.strokeRect(mx + sx * m, my + sy * m, vw * m, vh * m);
+      g.fillStyle = CH.ch4;
+      g.beginPath();
+      g.arc(mx + car.x * m, my + car.y * m, 3, 0, Math.PI * 2);
+      g.fill();
     };
     raf = requestAnimationFrame(frame);
-    return () => cancelAnimationFrame(raf);
+    return () => {
+      cancelAnimationFrame(raf);
+      io.disconnect();
+    };
   }, []);
 
   // Keyboard, only while the track has focus (so arrows still scroll the page elsewhere).
@@ -310,8 +391,13 @@ export function LabCar({ lang }: { lang: Locale }) {
           className="relative aspect-[4/3] w-full overflow-hidden border border-graticule bg-[#0b0e10] outline-offset-2 focus-visible:outline-2 focus-visible:outline-ch4 sm:aspect-[16/10]"
         >
           <canvas ref={canvas} className="absolute inset-0 h-full w-full" aria-hidden />
-          <p className="tabular absolute left-3 top-3 text-xs text-dim">{c.status(st)}</p>
-          <p className="absolute bottom-3 left-3 hidden text-xs text-dim [@media(pointer:fine)]:block">{c.keys}</p>
+          <p
+            className={`tabular absolute left-2.5 top-2.5 bg-screen/85 px-2 py-1 text-xs ${evt === "crash" ? "text-[#f0846e]" : evt === "parked" ? "text-ch4" : "text-dim"}`}
+            aria-live="polite"
+          >
+            {evt === "crash" ? c.crash : evt === "parked" ? c.parked : c.status(st)}
+          </p>
+          <p className="absolute bottom-2.5 left-2.5 hidden bg-screen/85 px-2 py-1 text-xs text-dim [@media(pointer:fine)]:block">{c.keys}</p>
         </div>
 
         {/* on-screen controls: hold to drive, like the real site */}

@@ -21,8 +21,8 @@ const exps: Exp[] = [
     ch: "ch4",
     name: { pt: "Controle do carrinho", en: "Car remote" },
     hint: {
-      pt: "Dirija pelo mesmo protocolo do site real: as letras que vão para o ESP32 e o estado que ele devolve.",
-      en: "Drive with the same protocol as the real site: the letters sent to the ESP32 and the state it sends back.",
+      pt: "Dirija pela cidadezinha usando o mesmo protocolo do site real: as letras que vão para o ESP32 e o estado que ele devolve.",
+      en: "Drive around a little town using the same protocol as the real site: the letters sent to the ESP32 and the state it sends back.",
     },
   },
   {
