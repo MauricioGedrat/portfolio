@@ -127,6 +127,12 @@
   }
 }
 
+/* Glows and parallax layers may extend past the edges; never let them widen the page. */
+html,
+body {
+  overflow-x: clip;
+}
+
 /* ─── Accent per section / discipline ───────────────────────────
    Sections and project rows set --accent; children read it. */
 .text-accent {

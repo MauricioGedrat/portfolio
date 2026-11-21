@@ -117,7 +117,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
           {/* the bench: stays in view while the answers scroll past */}
           <figure className="col-span-12 md:col-span-5 lg:col-span-4">
             <div className="relative overflow-hidden md:sticky md:top-[calc(var(--nav-h)+2rem)]">
-              <div className="relative aspect-[4/5] overflow-hidden">
+              <div className="relative aspect-[16/10] overflow-hidden md:aspect-[4/5]">
                 <div data-parallax="0.08" className="absolute inset-x-0 -inset-y-[10%]">
                   <Photo name="scope" lang={lang} sizes="(min-width: 768px) 33vw, 100vw" className="h-full w-full object-cover" />
                 </div>
@@ -126,7 +126,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
               </div>
               <figcaption className="mt-3 flex items-center gap-2 text-xs text-dim">
                 <span aria-hidden className="bg-accent inline-block h-px w-5" />
-                {lang === "pt" ? "Onde a maior parte do trabalho acontece: na bancada." : "Where most of the work happens: at the bench."}
+                {lang === "pt" ? "Na bancada, é o osciloscópio que diz se o circuito funciona." : "At the bench, the oscilloscope is what tells you whether the circuit works."}
               </figcaption>
             </div>
           </figure>
