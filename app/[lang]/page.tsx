@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { HeroName } from "@/components/hero-name";
+import { HeroScope } from "@/components/hero-scope";
 import { PcbPulse } from "@/components/pcb-pulse";
 import { ScopeTrace } from "@/components/scope-trace";
 import { SectionHeading } from "@/components/section-heading";
@@ -24,7 +25,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
       <section className="relative isolate flex min-h-[100svh] flex-col overflow-hidden pt-[var(--nav-h)]">
         {/* Desktop: the scope fills the right side, behind the name, clear of the text. */}
         <div data-reveal="fade" style={{ "--d": "250ms" } as React.CSSProperties} className="absolute bottom-0 right-0 top-[var(--nav-h)] -z-10 hidden w-[64%] md:block">
-          <ScopeTrace className="absolute inset-0 [mask-image:linear-gradient(to_right,transparent,black_30%)]" />
+          <HeroScope className="absolute inset-0 [mask-image:linear-gradient(to_right,transparent,black_30%)]" />
         </div>
 
         <div className="grid-frame w-full pt-[7vh]">

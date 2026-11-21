@@ -16,8 +16,8 @@ Documento vivo. Descreve como o site é montado, o que já existe e o que vem em
 | Framework | Next.js 16 (App Router), React 19, TypeScript | SSG + rotas de API no mesmo app |
 | Estilo | Tailwind v4 (`@theme`) + tokens próprios | Sistema de design em CSS, sem lib de UI |
 | Fonte | Archivo variável (eixo de largura 62–125%), self-hosted | O eixo de largura é parte da interação do hero |
-| Movimento | rAF + `damp()` próprio; Motion/GSAP só onde precisar | Bundle pequeno |
-| 3D | React Three Fiber (fase 3), carregado sob demanda | Só desktop com pointer fino; SVG como fallback |
+| Movimento | rAF + `damp()` próprio; revelação por IntersectionObserver | Bundle pequeno |
+| 3D | three.js, carregado sob demanda | Só desktop com pointer fino; SVG como fallback |
 | Dados privados | Supabase (Postgres + Auth + RLS) | CMS e analytics |
 | E-mail | Resend (fase 8) | Formulário de contato sem `mailto:` |
 | Mídia gerada | ElevenLabs (imagens animadas abstratas) | Plano grátis não gera vídeo |
@@ -125,7 +125,7 @@ Eventos: `page_view`, `project_view`, `resume_download`, `contact_click`, `cta_c
 ## 9. Movimento e 3D
 
 - **Hero (feito):** traço de osciloscópio em SVG. X do ponteiro → frequência, Y → amplitude, suavizado com `damp`. O nome muda de largura com o X do ponteiro. Pausa fora da tela.
-- **Fase 3:** "cascata de traços" em R3F. Organizada na home, complexa nos projetos, calma no sobre, convergindo no contato. Carregada com `dynamic(() => import(...), { ssr: false })` só em desktop com GPU. O SVG continua como fallback (mobile, reduced motion, sem WebGL).
+- **Fase 3 (feito):** cascata de persistência em three.js (`components/scope-waterfall.tsx`). O traço ao vivo fica na grade da frente, com o mesmo controle pelo ponteiro, e a cada 70 ms uma cópia dele recua em profundidade. Ao rolar para fora do hero, a amplitude cai e todos os traços convergem numa linha reta. Usei three.js puro em vez de React Three Fiber: a cena é imperativa (posições atualizadas a cada quadro) e assim evita uma camada a mais. `components/hero-scope.tsx` renderiza o SVG no servidor e só baixa o 3D (≈140 KB gzip) depois do carregamento, em desktop com ponteiro fino, WebGL e sem reduced motion; o 3D entra com fade no primeiro quadro e o loop do SVG é desligado.
 - **Mídia ElevenLabs:** loops curtos abstratos (placa, pulso de luz), convertidos para webm/mp4 com poster, `muted loop playsinline`, carregados com `preload="none"` fora da tela. Rotulados como ilustração. Nunca simulam foto de um projeto real.
 
 ## 10. Roadmap
@@ -134,7 +134,7 @@ Eventos: `page_view`, `project_view`, `resume_download`, `contact_click`, `cta_c
 |---|---|---|
 | 1 | Scaffold, design system, i18n, modelo de conteúdo | feito |
 | 2 | Nav, hero, seções da home, estudos de caso | feito |
-| 3 | Hero 3D (R3F) + fallback | próximo |
+| 3 | Hero 3D (three.js) + fallback | feito |
 | 4 | Transições de estudo de caso, cadeia de sinal animada | |
 | 5 | Linha do tempo e skills interativas | |
 | 6 | Experimento do Lab | |
