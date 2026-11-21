@@ -1,30 +1,52 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ContactForm } from "@/components/contact-form";
 import { HeroName } from "@/components/hero-name";
 import { HeroScope } from "@/components/hero-scope";
+import { LabGenerator } from "@/components/lab-generator";
 import { PcbPulse } from "@/components/pcb-pulse";
 import { ScopeTrace } from "@/components/scope-trace";
 import { SectionHeading } from "@/components/section-heading";
+import { SkillsBoard } from "@/components/skills-board";
+import { TimelineRail } from "@/components/timeline-rail";
 import { WorkIndex } from "@/components/work-index";
 import { about } from "@/content/about";
 import { profile } from "@/content/profile";
-import { projects } from "@/content/projects";
+import { getProjects } from "@/lib/content";
 import { skillGroups, timeline } from "@/content/timeline";
 import { getDictionary, hasLocale, t } from "@/lib/i18n";
+import { SITE_URL } from "@/lib/site";
 
 export default async function Home({ params }: PageProps<"/[lang]">) {
   const { lang } = await params;
   if (!hasLocale(lang)) notFound();
   const d = getDictionary(lang);
-  const ranked = [...projects].sort((a, b) => a.order - b.order);
+  const projects = await getProjects();
+  const ranked = projects;
   const cv = lang === "pt" ? "/cv/curriculo-mauricio-gedrat.pdf" : "/cv/resume-mauricio-gedrat.pdf";
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: profile.name,
+    url: `${SITE_URL}/${lang}`,
+    email: `mailto:${profile.email}`,
+    jobTitle: profile.role[lang],
+    description: profile.statement[lang],
+    address: { "@type": "PostalAddress", addressLocality: "Ivoti", addressRegion: "RS", addressCountry: "BR" },
+    alumniOf: { "@type": "EducationalOrganization", name: "Fundação Escola Técnica Liberato Salzano Vieira da Cunha" },
+    award: "2º lugar em Ciências da Computação — 41ª MOSTRATEC-Liberato",
+    sameAs: [profile.links.github, profile.links.linkedin],
+    knowsLanguage: ["pt-BR", "en"],
+  };
 
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       {/* ───────────── Hero ───────────── */}
       <section className="relative isolate flex min-h-[100svh] flex-col overflow-hidden pt-[var(--nav-h)]">
         {/* Desktop: the scope fills the right side, behind the name, clear of the text. */}
-        <div data-reveal="fade" style={{ "--d": "250ms" } as React.CSSProperties} className="absolute bottom-0 right-0 top-[var(--nav-h)] -z-10 hidden w-[64%] md:block">
+        <div data-intro="fade" style={{ "--d": "250ms" } as React.CSSProperties} className="absolute bottom-0 right-0 top-[var(--nav-h)] -z-10 hidden w-[64%] md:block">
           <HeroScope className="absolute inset-0 [mask-image:linear-gradient(to_right,transparent,black_30%)]" />
         </div>
 
@@ -38,7 +60,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
         <ScopeTrace className="relative mx-[var(--gutter)] mt-8 h-44 md:hidden" />
 
         <div className="grid-frame mt-auto w-full gap-y-6 pb-10 pt-10">
-          <div data-reveal style={{ "--d": "380ms" } as React.CSSProperties} className="col-span-12 md:col-span-7 lg:col-span-5">
+          <div data-intro style={{ "--d": "380ms" } as React.CSSProperties} className="col-span-12 md:col-span-7 lg:col-span-5">
             <p className="text-lg font-semibold">{profile.role[lang]}</p>
             <p className="measure mt-3 text-ink/85">{profile.statement[lang]}</p>
             <div className="mt-6 flex flex-wrap gap-3 text-sm">
@@ -50,7 +72,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
               </a>
             </div>
           </div>
-          <dl data-reveal style={{ "--d": "520ms" } as React.CSSProperties} className="col-span-12 grid grid-cols-2 gap-x-6 gap-y-3 self-end text-sm md:col-span-5 md:col-start-8 lg:col-span-4 lg:col-start-9">
+          <dl data-intro style={{ "--d": "520ms" } as React.CSSProperties} className="col-span-12 grid grid-cols-2 gap-x-6 gap-y-3 self-end text-sm md:col-span-5 md:col-start-8 lg:col-span-4 lg:col-start-9">
             <div>
               <dt className="text-dim">{lang === "pt" ? "Onde" : "Where"}</dt>
               <dd>{profile.location[lang]}</dd>
@@ -98,20 +120,26 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
       {/* ───────────── 03 Lab ───────────── */}
       <section id="lab" aria-labelledby="lab-title" className="grid-frame py-24 md:py-32">
         <SectionHeading id="lab" title={d.lab.title} intro={d.lab.intro} />
+        <LabGenerator lang={lang} />
       </section>
 
       {/* ───────────── 04 Experience ───────────── */}
       <section id="experience" aria-labelledby="experience-title" className="grid-frame py-24 md:py-32">
         <SectionHeading id="experience" title={d.experience.title} />
-        <ol className="col-span-12 mt-10 md:col-span-11 md:col-start-2">
+        <TimelineRail className="col-span-12 mt-10 md:col-span-11 md:col-start-2">
           {timeline.map((e, i) => (
             <li
               key={e.id}
               data-reveal="line"
+              data-row
               style={{ "--d": `${Math.min(i, 5) * 70}ms` } as React.CSSProperties}
-              className="rule-b grid grid-cols-12 gap-x-[var(--gutter)] gap-y-1 py-6"
+              className="group rule-b relative grid grid-cols-12 gap-x-[var(--gutter)] gap-y-1 py-6 pl-6"
             >
-              <span className="tabular col-span-12 text-sm text-dim md:col-span-3">{e.year}</span>
+              <span
+                aria-hidden
+                className="absolute left-0 top-[2.1rem] size-[7px] -translate-x-1/2 rounded-full border border-rule bg-screen transition-colors duration-[var(--dur-base)] group-data-[lit]:border-ch1 group-data-[lit]:bg-ch1"
+              />
+              <span className="tabular col-span-12 text-sm text-dim transition-colors group-data-[lit]:text-ink md:col-span-3">{e.year}</span>
               <div className="col-span-12 md:col-span-9">
                 <p className="text-lg font-semibold leading-snug">
                   {e.project ? (
@@ -127,47 +155,18 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
               </div>
             </li>
           ))}
-        </ol>
+        </TimelineRail>
       </section>
 
       {/* ───────────── 05 Skills ───────────── */}
       <section id="skills" aria-labelledby="skills-title" className="grid-frame py-24 md:py-32">
         <SectionHeading id="skills" title={d.skills.title} intro={d.skills.intro} />
-        <div className="col-span-12 mt-10 md:col-span-11 md:col-start-2">
-          {skillGroups.map((g, i) => (
-            <div
-              key={g.id}
-              data-reveal="line"
-              style={{ "--d": `${i * 70}ms` } as React.CSSProperties}
-              className="rule-b grid grid-cols-12 gap-x-[var(--gutter)] gap-y-3 py-7"
-            >
-              <div className="col-span-12 md:col-span-3">
-                <h3 className="text-lg font-semibold">{g.name[lang]}</h3>
-                <p className="mt-1 text-sm text-dim">{g.role[lang]}</p>
-              </div>
-              <ul className="col-span-12 flex flex-wrap gap-x-5 gap-y-1 md:col-span-5">
-                {g.items.map((it) => (
-                  <li key={t(it.name, "en")}>{t(it.name, lang)}</li>
-                ))}
-              </ul>
-              <div className="col-span-12 text-sm md:col-span-4">
-                <p className="text-dim">{d.skills.proof}</p>
-                <ul className="mt-1">
-                  {g.proof.map((slug) => {
-                    const p = projects.find((x) => x.slug === slug);
-                    return p ? (
-                      <li key={slug}>
-                        <Link href={`/${lang}/work/${slug}`} className="link-quiet">
-                          {p.title.split(":")[0]}
-                        </Link>
-                      </li>
-                    ) : null;
-                  })}
-                </ul>
-              </div>
-            </div>
-          ))}
-        </div>
+        <SkillsBoard
+          groups={skillGroups}
+          titles={Object.fromEntries(projects.map((p) => [p.slug, p.title.split(":")[0]]))}
+          lang={lang}
+          labels={{ proof: d.skills.proof, usedIn: d.skills.usedIn, noProject: d.skills.noProject }}
+        />
       </section>
 
       {/* ───────────── 06 Resume ───────────── */}
@@ -177,6 +176,9 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
           <a href={cv} download data-track="resume_download" data-track-target={lang} className="bg-ink px-4 py-2.5 font-semibold text-screen transition-colors hover:bg-ch1">
             {d.resume.download}
           </a>
+          <Link href={`/${lang}/resume`} className="border border-rule px-4 py-2.5 transition-colors hover:border-ink">
+            {d.resume.view}
+          </Link>
         </div>
       </section>
 
@@ -196,6 +198,9 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
             {profile.email}
           </a>
           <p className="mt-6 text-dim">{profile.seeking[lang]}</p>
+        </div>
+        <div data-reveal style={{ "--d": "260ms" } as React.CSSProperties} className="col-span-12 mt-12 md:col-span-8 md:col-start-2 lg:col-span-6 lg:col-start-2">
+          <ContactForm lang={lang} />
         </div>
       </section>
     </>

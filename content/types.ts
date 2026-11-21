@@ -82,7 +82,7 @@ export interface SkillGroup {
   name: L;
   /** What this system of skills is used for, in one line. */
   role: L;
-  items: { name: string | L }[];
+  items: { name: string | L; projects?: string[] }[];
   /** Projects that prove the skills — used by the interactive skill map. */
   proof: string[];
 }

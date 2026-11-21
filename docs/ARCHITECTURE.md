@@ -30,7 +30,10 @@ Documento vivo. Descreve como o site é montado, o que já existe e o que vem em
 /[lang]               → home (hero, trabalhos, sobre, lab, experiência, skills, currículo, contato)
 /[lang]/work/[slug]   → estudo de caso
 /[lang]/resume        → currículo em HTML (fase 7)
-/api/contact          → POST do formulário (fase 8)
+/api/contact          → POST do formulário (feito)
+/api/messages         → caixa de mensagens com senha (feito)
+/[lang]/resume        → currículo em HTML (feito)
+/[lang]/studio        → CMS com senha, noindex
 /api/track            → grava um evento (feito)
 /api/insights         → lê o painel com senha (feito)
 /api/keepalive        → cron diário que evita a pausa do Supabase
@@ -135,14 +138,14 @@ Eventos: `page_view`, `project_view`, `resume_download`, `contact_click`, `cta_c
 | 1 | Scaffold, design system, i18n, modelo de conteúdo | feito |
 | 2 | Nav, hero, seções da home, estudos de caso | feito |
 | 3 | Hero 3D (three.js) + fallback | feito |
-| 4 | Transições de estudo de caso, cadeia de sinal animada | |
-| 5 | Linha do tempo e skills interativas | |
-| 6 | Experimento do Lab | |
-| 7 | Página /resume e PDF a partir dos mesmos dados | |
-| 8 | Formulário de contato (Resend, honeypot, rate limit) | |
-| 9–11 | CMS no Supabase | |
+| 4 | Título que "viaja" da lista para o estudo de caso (View Transitions), cadeia de sinal com sonda animada | feito |
+| 5 | Linha do tempo com trilho que acende ao rolar; habilidades apontam os projetos que as usam | feito |
+| 6 | Lab: bancada virtual do gerador de funções (osciloscópio, FFT, THD, slew-rate do LM324) | feito |
+| 7 | /resume a partir dos mesmos dados, com versão de impressão; PDFs oficiais continuam para download | feito |
+| 8 | Formulário de contato → Supabase (honeypot, tempo mínimo, 5/dia por visitante); mensagens no /insights | feito |
+| 9–11 | /studio: edição dos textos dos projetos (PT/EN), ordem, destaque e ocultar; updateTag atualiza o site | código pronto; migração 0003 aguardando aprovação |
 | 12–13 | Analytics + painel /insights | feito |
-| 14–16 | SEO (sitemap, robots, OG), a11y, performance, polimento | |
+| 14–16 | sitemap, robots, imagens OG por página/projeto, JSON-LD, ícone; axe sem violações; Lighthouse mobile 96/100/100/100 | feito |
 
 ## 11. Limites dos planos grátis
 

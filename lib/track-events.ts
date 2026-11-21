@@ -3,6 +3,7 @@ export const trackEvents = [
   "project_view",
   "resume_download",
   "contact_click",
+  "contact_submit",
   "cta_click",
   "external_link_click",
   "locale_switch",

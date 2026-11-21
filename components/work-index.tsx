@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { ViewTransition } from "react";
 import type { Locale, Project } from "@/content/types";
 import { t, type Dictionary } from "@/lib/i18n";
 import { SignalChain } from "./signal-chain";
@@ -32,7 +33,9 @@ export function WorkIndex({ items, lang, d }: { items: Project[]; lang: Locale; 
                   i < 2 ? "text-[clamp(1.9rem,4.6vw,4rem)]" : "text-[clamp(1.6rem,3.4vw,2.9rem)]"
                 } leading-[0.95]`}
               >
-                {p.title.split(":")[0]}
+                <ViewTransition name={`title-${p.slug}`} share="morph" default="none">
+                  <span className="inline-block">{p.title.split(":")[0]}</span>
+                </ViewTransition>
               </h3>
               <p className="measure mt-3 text-dim">{t(p.subtitle, lang)}</p>
               {p.award && (

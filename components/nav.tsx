@@ -71,7 +71,7 @@ export function Nav({ lang, d }: { lang: Locale; d: Dictionary }) {
   const href = (id: SectionId) => (isHome ? `#${id}` : `/${lang}#${id}`);
 
   return (
-    <header
+    <header data-print-hide
       className={`fixed inset-x-0 top-0 z-40 h-[var(--nav-h)] transition-[background-color,border-color] duration-[var(--dur-base)] ${
         scrolled || open ? "border-b border-graticule bg-screen" : "border-b border-transparent"
       }`}

@@ -10,7 +10,7 @@ async function currentYear() {
 export async function Footer({ lang, d }: { lang: Locale; d: Dictionary }) {
   const year = await currentYear();
   return (
-    <footer className="border-t border-graticule">
+    <footer data-print-hide className="border-t border-graticule">
       <div className="grid-frame gap-y-6 py-10 text-sm text-dim">
         <p className="col-span-12 md:col-span-6">{d.footer.built}</p>
         <ul className="col-span-12 flex flex-wrap gap-x-6 gap-y-2 md:col-span-6 md:justify-end">

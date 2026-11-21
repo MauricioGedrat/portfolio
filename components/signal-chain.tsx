@@ -1,5 +1,6 @@
 import type { ChainNode, Locale } from "@/content/types";
 import { t } from "@/lib/i18n";
+import { LiveChain } from "./live-chain";
 
 /**
  * A project's system as a signal chain: each block feeds the next.
@@ -20,17 +21,7 @@ export function SignalChain({ nodes, lang, compact = false }: { nodes: ChainNode
     );
   }
 
-  return (
-    <ol className="grid gap-px bg-graticule md:auto-cols-fr md:grid-flow-col">
-      {nodes.map((n, i) => (
-        <li key={n.id} className="relative bg-screen p-5 md:min-h-40">
-          <span className="tabular text-xs text-dim">{String(i + 1).padStart(2, "0")}</span>
-          <p className="mt-6 text-lg font-semibold leading-tight condensed">{t(n.label, lang)}</p>
-          {n.detail && <p className="mt-1 text-sm text-dim">{t(n.detail, lang)}</p>}
-        </li>
-      ))}
-    </ol>
-  );
+  return <LiveChain nodes={nodes} lang={lang} />;
 }
 
 function Arrow() {

@@ -1,6 +1,6 @@
-import { createHash } from "node:crypto";
 import { rpc } from "@/lib/supabase-public";
 import { trackEvents, type TrackEvent } from "@/lib/track-events";
+import { cityOf, visitorId } from "@/lib/visitor";
 
 const BOT = /bot|crawl|spider|slurp|preview|facebookexternalhit|whatsapp|telegram|headless|lighthouse|vercel-screenshot|python|curl|wget/i;
 
@@ -24,14 +24,6 @@ function browser(ua: string): string {
   return "Outro";
 }
 
-const decode = (v: string | null) => {
-  if (!v) return null;
-  try {
-    return decodeURIComponent(v);
-  } catch {
-    return v;
-  }
-};
 
 /**
  * Records one event. No cookies and no raw IP are stored: the visitor id is a
@@ -51,9 +43,7 @@ export async function POST(request: Request) {
   const name = body.name as TrackEvent;
   if (!trackEvents.includes(name)) return new Response(null, { status: 400 });
 
-  const ip = (request.headers.get("x-forwarded-for") ?? "").split(",")[0].trim();
-  const day = new Date().toISOString().slice(0, 10);
-  const visitor = createHash("sha256").update(`${ip}|${ua}|${day}|mg-portfolio`).digest("hex").slice(0, 16);
+  const visitor = visitorId(request);
 
   let referrerHost: string | null = null;
   const ref = clip(body.referrer, 500);
@@ -72,7 +62,7 @@ export async function POST(request: Request) {
     p_referrer: referrerHost,
     p_country: request.headers.get("x-vercel-ip-country"),
     p_region: request.headers.get("x-vercel-ip-country-region"),
-    p_city: decode(request.headers.get("x-vercel-ip-city")),
+    p_city: cityOf(request),
     p_device: device(ua),
     p_browser: browser(ua),
     p_visitor: visitor,

@@ -9,6 +9,7 @@ import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { getDictionary, hasLocale, locales } from "@/lib/i18n";
 import { profile } from "@/content/profile";
+import { SITE_URL } from "@/lib/site";
 
 const archivo = localFont({
   src: [
@@ -28,9 +29,18 @@ export async function generateMetadata({ params }: LayoutProps<"/[lang]">): Prom
   const { lang } = await params;
   if (!hasLocale(lang)) return {};
   return {
+    metadataBase: new URL(SITE_URL),
     title: { default: `${profile.name} — ${profile.role[lang]}`, template: `%s — ${profile.name}` },
     description: profile.statement[lang],
-    alternates: { languages: { "pt-BR": "/pt", en: "/en" } },
+    alternates: { canonical: `/${lang}`, languages: { "pt-BR": "/pt", en: "/en" } },
+    openGraph: {
+      type: "website",
+      siteName: profile.name,
+      locale: lang === "pt" ? "pt_BR" : "en_US",
+      alternateLocale: lang === "pt" ? "en_US" : "pt_BR",
+    },
+    twitter: { card: "summary_large_image" },
+    authors: [{ name: profile.name, url: SITE_URL }],
   };
 }
 
@@ -50,6 +60,7 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
         <RevealObserver />
         <Analytics />
         <a
+          data-print-hide
           href="#main"
           className="sr-only z-50 bg-ch1 px-4 py-2 text-screen focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
         >

@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { ViewTransition } from "react";
 import { notFound } from "next/navigation";
 import { SignalChain } from "@/components/signal-chain";
-import { getProject, projects } from "@/content/projects";
+import { projects } from "@/content/projects";
+import { getProjectBySlug, getProjects } from "@/lib/content";
 import { getDictionary, hasLocale, locales, t } from "@/lib/i18n";
 
 export function generateStaticParams() {
@@ -12,18 +14,26 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps<"/[lang]/work/[slug]">): Promise<Metadata> {
   const { lang, slug } = await params;
-  const p = getProject(slug);
+  const p = await getProjectBySlug(slug);
   if (!p || !hasLocale(lang)) return {};
-  return { title: p.title.split(":")[0], description: t(p.summary, lang) };
+  return {
+    title: p.title.split(":")[0],
+    description: t(p.summary, lang),
+    alternates: {
+      canonical: `/${lang}/work/${slug}`,
+      languages: { "pt-BR": `/pt/work/${slug}`, en: `/en/work/${slug}` },
+    },
+    openGraph: { type: "article" },
+  };
 }
 
 export default async function CaseStudy({ params }: PageProps<"/[lang]/work/[slug]">) {
   const { lang, slug } = await params;
-  const p = getProject(slug);
+  const p = await getProjectBySlug(slug);
   if (!p || !hasLocale(lang)) notFound();
   const d = getDictionary(lang);
 
-  const ranked = [...projects].sort((a, b) => a.order - b.order);
+  const ranked = await getProjects();
   const next = ranked[(ranked.findIndex((x) => x.slug === p.slug) + 1) % ranked.length];
   const [headline, subhead] = p.title.split(":");
 
@@ -33,8 +43,10 @@ export default async function CaseStudy({ params }: PageProps<"/[lang]/work/[slu
         <Link href={`/${lang}#work`} className="col-span-12 text-sm text-dim hover:text-ink">
           ← {d.caseStudy.back}
         </Link>
-        <h1 data-reveal="clip" style={{ "--d": "60ms" } as React.CSSProperties} className="display condensed col-span-12 mt-10 text-[clamp(2.8rem,8vw,7.5rem)] lg:col-span-11">
-          {headline}
+        <h1 className="display condensed col-span-12 mt-10 text-[clamp(2.8rem,8vw,7.5rem)] lg:col-span-11">
+          <ViewTransition name={`title-${p.slug}`} share="morph" default="none">
+            <span className="inline-block">{headline}</span>
+          </ViewTransition>
           {subhead && <span className="mt-3 block text-[0.42em] font-semibold leading-tight text-dim">{subhead.trim()}</span>}
         </h1>
         <p data-reveal style={{ "--d": "260ms" } as React.CSSProperties} className="measure col-span-12 mt-8 text-lg leading-snug md:col-span-8">{t(p.subtitle, lang)}</p>

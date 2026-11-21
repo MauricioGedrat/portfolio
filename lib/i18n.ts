@@ -83,18 +83,20 @@ const dictionary = {
   lab: {
     title: { pt: "Lab", en: "Lab" },
     intro: {
-      pt: "Experimentos curtos: simulações e visualizações de engenharia que rodam no navegador.",
-      en: "Short experiments: engineering simulations and visualizations that run in the browser.",
+      pt: "Bancada virtual do gerador de funções: mexa nos potenciômetros e veja a onda e as harmônicas mudarem.",
+      en: "A virtual bench for the function generator: turn the pots and watch the wave and its harmonics change.",
     },
   },
   experience: { title: { pt: "Trajetória", en: "Experience" } },
   skills: {
     title: { pt: "Habilidades", en: "Skills" },
     intro: {
-      pt: "Organizadas como sistemas: cada grupo aponta os projetos que o comprovam.",
-      en: "Organized as systems: each group points to the projects that prove it.",
+      pt: "Cada grupo aponta os projetos que o comprovam. Passe o mouse ou toque numa habilidade para ver onde ela foi usada.",
+      en: "Each group points to the projects that prove it. Point at or tap a skill to see where it was used.",
     },
     proof: { pt: "Comprovado em", en: "Proven in" },
+    usedIn: { pt: "Usado em", en: "Used in" },
+    noProject: { pt: "Ainda sem projeto publicado aqui.", en: "No project published here yet." },
   },
   resume: {
     title: { pt: "Currículo", en: "Resume" },
@@ -104,8 +106,8 @@ const dictionary = {
   contact: {
     title: { pt: "Vamos construir algo.", en: "Let's build something." },
     intro: {
-      pt: "Estágio, projeto ou só uma pergunta sobre um trabalho daqui — escreva.",
-      en: "An internship, a project or just a question about something here — write to me.",
+      pt: "Estágio, projeto ou só uma pergunta sobre um trabalho daqui. Escreva pelo e-mail ou pelo formulário.",
+      en: "An internship, a project or just a question about something here. Write by e-mail or use the form.",
     },
   },
   footer: {

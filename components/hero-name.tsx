@@ -52,7 +52,7 @@ export function HeroName({ lines }: { lines: string[] }) {
         <span
           key={line}
           aria-hidden
-          data-reveal="clip"
+          data-intro="clip"
           style={{ "--d": `${80 + i * 110}ms` } as React.CSSProperties}
           className="block"
         >

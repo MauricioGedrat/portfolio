@@ -37,6 +37,8 @@ type Data = {
   recent: Row[];
 };
 
+type Message = { id: number; at: string; name: string; email: string; body: string; locale: string | null; city: string | null; read: boolean };
+
 const KEY = "mg-insights-key";
 
 const copy = {
@@ -72,6 +74,10 @@ const copy = {
     none: "Nada ainda neste período.",
     unknown: "Desconhecido",
     logout: "Sair",
+    messages: "Mensagens",
+    noMessages: "Nenhuma mensagem ainda.",
+    isNew: "nova",
+    reply: "Responder",
     resumeFile: "Currículo",
     estimate: "Visitante = mesma conexão e navegador no mesmo dia.",
     events: {
@@ -79,6 +85,7 @@ const copy = {
       project_view: "Abriu projeto",
       resume_download: "Baixou currículo",
       contact_click: "Clicou no e-mail",
+      contact_submit: "Enviou mensagem",
       cta_click: "Clicou em Ver trabalhos",
       external_link_click: "Saiu por link",
       locale_switch: "Trocou idioma",
@@ -116,6 +123,10 @@ const copy = {
     none: "Nothing yet in this period.",
     unknown: "Unknown",
     logout: "Log out",
+    messages: "Messages",
+    noMessages: "No messages yet.",
+    isNew: "new",
+    reply: "Reply",
     resumeFile: "Resume",
     estimate: "Visitor = same connection and browser on the same day.",
     events: {
@@ -123,6 +134,7 @@ const copy = {
       project_view: "Opened project",
       resume_download: "Downloaded resume",
       contact_click: "Clicked e-mail",
+      contact_submit: "Sent a message",
       cta_click: "Clicked See work",
       external_link_click: "Left via link",
       locale_switch: "Switched language",
@@ -149,6 +161,7 @@ export function InsightsApp({ lang }: { lang: Locale }) {
   const [days, setDays] = useState(30);
   const [data, setData] = useState<Data | null>(null);
   const [state, setState] = useState<"idle" | "loading" | "wrong">("idle");
+  const [messages, setMessages] = useState<Message[] | null>(null);
 
   useEffect(() => {
     try {
@@ -173,6 +186,14 @@ export function InsightsApp({ lang }: { lang: Locale }) {
     }
     setData(await res.json());
     setState("idle");
+    fetch("/api/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ key: k }),
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((m) => m && setMessages((prev) => prev ?? m))
+      .catch(() => {});
     try {
       sessionStorage.setItem(KEY, k);
       localStorage.setItem(OWNER_FLAG, "1");
@@ -298,6 +319,42 @@ export function InsightsApp({ lang }: { lang: Locale }) {
         <RankList title={c.topProjects} empty={c.none} rows={data.projects.map((r) => ({ label: projectTitle(r.slug), value: r.views }))} />
         <RankList title={c.devices} empty={c.none} rows={data.devices.map((r) => ({ label: r.device, value: r.visitors }))} />
       </div>
+
+      <section className="col-span-12">
+        <h2 className="text-sm text-dim">
+          {c.messages}
+          {messages && messages.some((m) => !m.read) && (
+            <span className="ml-2 bg-ch1 px-1.5 py-0.5 text-xs font-semibold text-screen">
+              {messages.filter((m) => !m.read).length} {c.isNew}
+            </span>
+          )}
+        </h2>
+        {!messages || messages.length === 0 ? (
+          <p className="mt-3 text-sm text-dim">{c.noMessages}</p>
+        ) : (
+          <ol className="mt-3">
+            {messages.map((m) => (
+              <li key={m.id} className="rule-b grid gap-x-[var(--gutter)] gap-y-1 py-4 md:grid-cols-12">
+                <div className="text-sm md:col-span-3">
+                  <p className="font-semibold">
+                    {m.name}
+                    {!m.read && <span className="ml-2 text-xs text-ch1">{c.isNew}</span>}
+                  </p>
+                  <p className="tabular text-dim">{fmtWhen(m.at, lang)}</p>
+                  {m.city && <p className="text-dim">{m.city}</p>}
+                </div>
+                <p className="whitespace-pre-wrap md:col-span-7">{m.body}</p>
+                <div className="text-sm md:col-span-2 md:text-right">
+                  <a href={`mailto:${m.email}`} className="link-quiet">
+                    {c.reply}
+                  </a>
+                  <p className="break-all text-dim">{m.email}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        )}
+      </section>
 
       <EventTable
         title={c.whoDownloaded}

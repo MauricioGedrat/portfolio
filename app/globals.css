@@ -120,6 +120,112 @@
   }
 }
 
+/* ─── Range input (Lab) ─────────────────────────────────────────── */
+.range {
+  appearance: none;
+  height: 20px;
+  background: transparent;
+  cursor: pointer;
+}
+.range::-webkit-slider-runnable-track {
+  height: 1px;
+  background: var(--color-rule);
+}
+.range::-moz-range-track {
+  height: 1px;
+  background: var(--color-rule);
+}
+.range::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: -7px;
+  border-radius: 999px;
+  background: var(--color-ink);
+  border: 3px solid var(--color-screen);
+  box-shadow: 0 0 0 1px var(--color-ink);
+}
+.range::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--color-ink);
+  border: 3px solid var(--color-screen);
+  box-shadow: 0 0 0 1px var(--color-ink);
+}
+.range:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 2px var(--color-ch1);
+}
+.range:hover::-webkit-slider-thumb {
+  background: var(--color-ch1);
+}
+
+/* ─── Page transitions ─────────────────────────────────────────────
+   The project title morphs from the work list into the case-study header;
+   everything else crossfades quickly. */
+::view-transition-group(.morph) {
+  animation-duration: 520ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+::view-transition-image-pair(.morph) {
+  animation-name: via-blur;
+}
+@keyframes via-blur {
+  35% {
+    filter: blur(2px);
+  }
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 240ms;
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* ─── Intro (hero) ────────────────────────────────────────────────
+   Pure CSS so it starts on first paint, without waiting for JavaScript. */
+[data-intro] {
+  animation: intro-rise 900ms var(--ease-out-expo) var(--d, 0ms) both;
+}
+[data-intro="fade"] {
+  animation-name: intro-fade;
+  animation-duration: 1200ms;
+}
+[data-intro="clip"] {
+  animation-name: intro-clip;
+}
+@keyframes intro-rise {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem);
+  }
+}
+@keyframes intro-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes intro-clip {
+  from {
+    clip-path: inset(calc(100% + 0.3em) -0.1em -0.25em -0.1em);
+    transform: translateY(0.35em);
+  }
+  to {
+    clip-path: inset(-0.2em -0.1em -0.25em -0.1em);
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-intro] {
+    animation: none;
+  }
+}
+
 /* ─── Build-up on scroll ───────────────────────────────────────────
    Elements marked data-reveal start "unpowered" and switch on when they
    enter the viewport (RevealObserver sets data-shown). Hidden state only
@@ -208,5 +314,35 @@ html.js-reveal [data-reveal="fade"]:not([data-shown]) {
     animation-duration: 1ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 1ms !important;
+  }
+}
+
+/* ─── Print (the /resume page prints as a clean document) ──────── */
+@media print {
+  @page {
+    margin: 14mm 16mm;
+  }
+  html,
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+  [data-print-hide] {
+    display: none !important;
+  }
+  html.js-reveal [data-reveal],
+  html.js-reveal [data-reveal] > * {
+    opacity: 1 !important;
+    transform: none !important;
+    clip-path: none !important;
+  }
+  .rule-t,
+  .rule-b,
+  .rule-y {
+    background-image: linear-gradient(#ccc, #ccc) !important;
+    background-size: 100% 1px !important;
+  }
+  a {
+    color: inherit;
   }
 }
