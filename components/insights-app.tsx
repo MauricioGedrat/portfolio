@@ -78,6 +78,8 @@ const copy = {
     noMessages: "Nenhuma mensagem ainda.",
     isNew: "nova",
     reply: "Responder",
+    notifyOn: "Aviso por e-mail ligado: cada mensagem nova também chega no seu e-mail.",
+    notifyOff: "Aviso por e-mail desligado. As mensagens ficam só aqui até a chave RESEND_API_KEY ser configurada na Vercel.",
     resumeFile: "Currículo",
     estimate: "Visitante = mesma conexão e navegador no mesmo dia.",
     events: {
@@ -127,6 +129,8 @@ const copy = {
     noMessages: "No messages yet.",
     isNew: "new",
     reply: "Reply",
+    notifyOn: "E-mail notice on: every new message also reaches your inbox.",
+    notifyOff: "E-mail notice off. Messages only show up here until RESEND_API_KEY is set in Vercel.",
     resumeFile: "Resume",
     estimate: "Visitor = same connection and browser on the same day.",
     events: {
@@ -162,6 +166,7 @@ export function InsightsApp({ lang }: { lang: Locale }) {
   const [data, setData] = useState<Data | null>(null);
   const [state, setState] = useState<"idle" | "loading" | "wrong">("idle");
   const [messages, setMessages] = useState<Message[] | null>(null);
+  const [notify, setNotify] = useState<"on" | "off" | null>(null);
 
   useEffect(() => {
     try {
@@ -191,7 +196,12 @@ export function InsightsApp({ lang }: { lang: Locale }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ key: k }),
     })
-      .then((r) => (r.ok ? r.json() : null))
+      .then((r) => {
+        if (!r.ok) return null;
+        const h = r.headers.get("X-Email-Notify");
+        if (h === "on" || h === "off") setNotify(h);
+        return r.json();
+      })
       .then((m) => m && setMessages((prev) => prev ?? m))
       .catch(() => {});
     try {
@@ -329,6 +339,7 @@ export function InsightsApp({ lang }: { lang: Locale }) {
             </span>
           )}
         </h2>
+        {notify && <p className={`mt-1 text-xs ${notify === "on" ? "text-ch4" : "text-dim"}`}>{notify === "on" ? c.notifyOn : c.notifyOff}</p>}
         {!messages || messages.length === 0 ? (
           <p className="mt-3 text-sm text-dim">{c.noMessages}</p>
         ) : (

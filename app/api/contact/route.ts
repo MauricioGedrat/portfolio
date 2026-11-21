@@ -1,3 +1,5 @@
+import { after } from "next/server";
+import { notifyContact } from "@/lib/notify";
 import { rpc } from "@/lib/supabase-public";
 import { cityOf, visitorId } from "@/lib/visitor";
 
@@ -28,16 +30,19 @@ export async function POST(request: Request) {
     return Response.json({ status: "invalid" }, { status: 400 });
   }
 
+  const city = cityOf(request);
   const { ok, data } = await rpc<string>("submit_message", {
     p_name: name,
     p_email: email,
     p_body: message,
     p_locale: locale,
-    p_city: cityOf(request),
+    p_city: city,
     p_visitor: visitorId(request),
   });
   if (!ok) return Response.json({ status: "error" }, { status: 502 });
   if (data === "limited") return Response.json({ status: "limited" }, { status: 429 });
   if (data !== "ok") return Response.json({ status: "invalid" }, { status: 400 });
+  // Saved. The e-mail notice goes out after the response, so the visitor never waits on it.
+  after(() => notifyContact({ name, email, message, locale, city }));
   return Response.json({ status: "ok" });
 }

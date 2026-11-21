@@ -147,6 +147,7 @@ Eventos: `page_view`, `project_view`, `resume_download`, `contact_click`, `cta_c
 | 6b | Lab em abas (`components/lab/`): + controle do carrinho (mesmo protocolo F/B/S, L/R/C, 1/2/3, H/h e PWM do firmware; estado TX de 4 letras, tabela da L298N, LEDs) e condicionador de termopar K (polinômio NIST ITS-90, ganho 201,8, saída 10 mV/°C, erro × limite de 2 %) | feito |
 | 7 | /resume a partir dos mesmos dados, com versão de impressão; PDFs oficiais continuam para download | feito |
 | 8 | Formulário de contato → Supabase (honeypot, tempo mínimo, 5/dia por visitante); mensagens no /insights | feito |
+| 8b | Aviso por e-mail de cada mensagem (Resend grátis, `lib/notify.ts`, enviado com `after()` depois de salvar). Variáveis na Vercel: `RESEND_API_KEY` (obrigatória) e `CONTACT_TO` (opcional). Sem domínio próprio, o Resend só entrega no e-mail da conta dele. O /insights mostra se o aviso está ligado | feito |
 | 9–11 | /studio: edição dos textos dos projetos (PT/EN), ordem, destaque e ocultar; updateTag atualiza o site | feito |
 | 12–13 | Analytics + painel /insights | feito |
 | 14–16 | sitemap, robots, imagens OG por página/projeto, JSON-LD, ícone; axe sem violações; Lighthouse mobile 96/100/100/100 | feito |
