@@ -342,13 +342,13 @@ export function LabCar({ lang }: { lang: Locale }) {
   // Keyboard, only while the track has focus (so arrows still scroll the page elsewhere).
   const held = useRef<{ mov: string | null; dir: string | null }>({ mov: null, dir: null });
   const onKeyDown = (e: React.KeyboardEvent) => {
+    // block page scrolling for every drive key, including the auto-repeat while held
+    if (KEY_MOV[e.key] || KEY_DIR[e.key]) e.preventDefault();
     if (e.repeat) return;
     if (KEY_MOV[e.key]) {
-      e.preventDefault();
       held.current.mov = e.key;
       send(KEY_MOV[e.key]);
     } else if (KEY_DIR[e.key]) {
-      e.preventDefault();
       held.current.dir = e.key;
       send(KEY_DIR[e.key]);
     } else if (e.key === "1" || e.key === "2" || e.key === "3") send(e.key);
@@ -373,21 +373,24 @@ export function LabCar({ lang }: { lang: Locale }) {
   const in4 = st.dir === "R" ? 1 : 0;
 
   return (
-    <div className="grid grid-cols-12 gap-x-[var(--gutter)] gap-y-8">
+    <div
+      className="grid grid-cols-12 gap-x-[var(--gutter)] gap-y-8"
+      onKeyDown={onKeyDown}
+      onKeyUp={onKeyUp}
+      onBlur={(e) => {
+        // focus left the whole widget: keys still held will never fire keyup, so release them
+        if (e.currentTarget.contains(e.relatedTarget as Node | null)) return;
+        if (held.current.mov) send("S");
+        if (held.current.dir) send("C");
+        held.current = { mov: null, dir: null };
+      }}
+    >
       <div className="col-span-12 lg:col-span-8">
         <div
           ref={box}
           tabIndex={0}
           role="application"
           aria-label={`${c.arena}. ${c.keys}`}
-          onKeyDown={onKeyDown}
-          onKeyUp={onKeyUp}
-          onBlur={() => {
-            // keys held when focus leaves will never fire keyup: release them
-            if (held.current.mov) send("S");
-            if (held.current.dir) send("C");
-            held.current = { mov: null, dir: null };
-          }}
           className="relative aspect-[4/3] w-full overflow-hidden border border-graticule bg-[#0b0e10] outline-offset-2 focus-visible:outline-2 focus-visible:outline-ch4 sm:aspect-[16/10]"
         >
           <canvas ref={canvas} className="absolute inset-0 h-full w-full" aria-hidden />
