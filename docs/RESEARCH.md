@@ -15,7 +15,7 @@ Registro do que foi verificado para o conteúdo do site. Manter o repositório p
 
 ## Candidatos não incluídos
 
-- **blog-nextjs-react** — Next 14 + Supabase + Resend. O nome aparece em ENV_SETUP, GUIA_RAPIDO e na rota de contato. Pode entrar como projeto menor se o Maurício confirmar que é dele.
+- **blog-nextjs-react** — fora por decisão do Maurício.
 - **webcraft** — sem menção ao nome. Fora.
 - **my-portfolio** — portfólio antigo; não é projeto de portfólio.
 
@@ -25,5 +25,5 @@ Registro do que foi verificado para o conteúdo do site. Manter o repositório p
 
 ## Pontos de atenção
 
-- Os PDFs em `public/cv/` têm o telefone. Avaliar uma versão pública sem telefone.
+- Os PDFs em `public/cv/` têm o telefone; o Maurício decidiu manter assim.
 - Supabase grátis pausa por inatividade; o site público não depende dele em tempo de execução.
