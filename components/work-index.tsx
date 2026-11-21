@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { Locale, Project } from "@/content/types";
 import { t, type Dictionary } from "@/lib/i18n";
@@ -25,7 +26,7 @@ export function WorkIndex({ items, lang, d }: { items: Project[]; lang: Locale; 
           >
             <span className="tabular col-span-2 pt-2 text-sm text-dim md:col-span-1">{String(i + 1).padStart(2, "0")}</span>
 
-            <div className="col-span-10 md:col-span-8">
+            <div className={`col-span-10 ${p.media?.length ? "md:col-span-6" : "md:col-span-8"}`}>
               <h3
                 className={`display font-bold transition-[font-stretch,color] duration-[var(--dur-slow)] ease-[var(--ease-out-expo)] [font-stretch:80%] group-hover:[font-stretch:96%] group-focus-visible:[font-stretch:96%] ${
                   i < 2 ? "text-[clamp(1.9rem,4.6vw,4rem)]" : "text-[clamp(1.6rem,3.4vw,2.9rem)]"
@@ -44,6 +45,19 @@ export function WorkIndex({ items, lang, d }: { items: Project[]; lang: Locale; 
                 <SignalChain nodes={p.chain} lang={lang} compact />
               </div>
             </div>
+
+            {p.media?.[0] && (
+              <div className="col-span-10 col-start-3 overflow-hidden bg-panel md:col-span-2 md:col-start-auto md:mt-2 md:self-start">
+                <Image
+                  src={p.media[0].src}
+                  width={p.media[0].width}
+                  height={p.media[0].height}
+                  alt=""
+                  sizes="(min-width: 768px) 16vw, 80vw"
+                  className="aspect-[4/3] h-auto w-full object-cover opacity-80 grayscale transition-[filter,opacity,transform] duration-[var(--dur-slow)] ease-[var(--ease-out-expo)] group-hover:scale-[1.03] group-hover:opacity-100 group-hover:grayscale-0 group-focus-visible:opacity-100 group-focus-visible:grayscale-0"
+                />
+              </div>
+            )}
 
             <dl className="col-span-10 col-start-3 flex gap-6 text-sm text-dim md:col-span-3 md:col-start-auto md:flex-col md:items-end md:gap-1 md:pt-2 md:text-right">
               <div>

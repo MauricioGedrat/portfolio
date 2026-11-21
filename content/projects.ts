@@ -76,6 +76,41 @@ export const projects: Project[] = [
       pt: "O trabalho ficou em 2º lugar na área de Ciências da Computação da 41ª MOSTRATEC-Liberato, Mostra Internacional de Ciência e Tecnologia, em outubro de 2026.",
       en: "The project won 2nd place in the Computer Science category at the 41st MOSTRATEC-Liberato, an international science and technology fair, in October 2026.",
     },
+    media: [
+      {
+        src: "/work/sentimento-retorno-b3/premiacao.webp",
+        width: 1600,
+        height: 1200,
+        alt: {
+          pt: "Maurício Gedrat e Leonardo Kohn na cerimônia de premiação, um deles mostrando a medalha",
+          en: "Maurício Gedrat and Leonardo Kohn at the awards ceremony, one of them showing the medal",
+        },
+        caption: {
+          pt: "Cerimônia de premiação da 41ª MOSTRATEC-Liberato: 2º lugar em Ciências da Computação.",
+          en: "Awards ceremony at the 41st MOSTRATEC-Liberato: 2nd place in Computer Science.",
+        },
+      },
+      {
+        src: "/work/sentimento-retorno-b3/estande-mostratec.webp",
+        width: 960,
+        height: 1280,
+        alt: {
+          pt: "Maurício Gedrat e Leonardo Kohn no estande 101, em frente ao banner do projeto",
+          en: "Maurício Gedrat and Leonardo Kohn at booth 101, in front of the project poster",
+        },
+        caption: { pt: "Estande 101 na feira.", en: "Booth 101 at the fair." },
+      },
+      {
+        src: "/work/sentimento-retorno-b3/crachas-finalistas.webp",
+        width: 1200,
+        height: 1600,
+        alt: {
+          pt: "Crachás de finalista da MOSTRATEC em frente ao banner e ao notebook com o projeto",
+          en: "MOSTRATEC finalist badges in front of the poster and the laptop running the project",
+        },
+        caption: { pt: "Crachás de finalista, com o banner e o projeto rodando no notebook.", en: "Finalist badges, with the poster and the project running on the laptop." },
+      },
+    ],
     technologies: ["Python", "NLP", "Statistics", "Streamlit", "Git"],
     sources: [
       {
@@ -152,6 +187,44 @@ export const projects: Project[] = [
       pt: "Funciona no Chrome e no Edge, no Android e no computador. Não funciona no iPhone nem no Firefox, que não liberam Web Bluetooth, e exige HTTPS.",
       en: "Works in Chrome and Edge on Android and desktop. It doesn't work on iPhone or Firefox, which don't support Web Bluetooth, and it requires HTTPS.",
     },
+    media: [
+      {
+        src: "/work/carrinho-web-bluetooth/ligacoes.webp",
+        width: 1600,
+        height: 900,
+        alt: {
+          pt: "Diagrama de ligações: navegador por BLE até o ESP32, que comanda o L298N, os dois motores e os LEDs",
+          en: "Wiring diagram: browser over BLE to the ESP32, which drives the L298N, both motors and the LEDs",
+        },
+        caption: {
+          pt: "Ligações, com os pinos tirados do firmware. A alimentação não aparece no desenho.",
+          en: "Wiring, with the pins taken from the firmware. Power is not shown.",
+        },
+      },
+      {
+        src: "/work/carrinho-web-bluetooth/site-desktop.webp",
+        width: 1600,
+        height: 1000,
+        alt: {
+          pt: "Site de controle no computador: botões de frente, ré, esquerda e direita ao redor do desenho do carrinho",
+          en: "Control site on a computer: forward, reverse, left and right buttons around the car drawing",
+        },
+        caption: {
+          pt: "O site no computador, em modo demonstração: andando na velocidade 2 com o farol ligado.",
+          en: "The site on a computer, in demo mode: driving at speed 2 with the headlight on.",
+        },
+      },
+      {
+        src: "/work/carrinho-web-bluetooth/site-celular.webp",
+        width: 780,
+        height: 1828,
+        alt: {
+          pt: "Site de controle no celular, com o carrinho visto de cima e os botões embaixo",
+          en: "Control site on a phone, with the car seen from above and the buttons below",
+        },
+        caption: { pt: "A mesma tela no celular.", en: "The same screen on a phone." },
+      },
+    ],
     technologies: ["Next.js", "TypeScript", "Tailwind CSS", "Web Bluetooth API", "ESP32", "Arduino (C++)", "L298N"],
     sources: [
       {
@@ -250,44 +323,124 @@ export const projects: Project[] = [
       en: "A ±12 V function generator that produces three waveforms, measured and analysed on an oscilloscope.",
     },
     problem: {
-      pt: "Construir, só com comparador e amplificadores operacionais, um gerador com faixa de frequência larga — e verificar quanto a senoide distorce nas frequências altas.",
-      en: "Build a wide-range generator from just a comparator and op-amps — and check how much the sine distorts at high frequencies.",
+      pt: "Construir, só com comparador e amplificadores operacionais, um gerador de faixa larga (Parte 1) e depois transformá-lo num instrumento: simetria ajustável, seleção de onda, amplitude, nível DC e um VCO (Parte 2) — medindo quanto a senoide distorce.",
+      en: "Build a wide-range generator from just a comparator and op-amps (Part 1), then turn it into an instrument: adjustable symmetry, waveform selection, amplitude, DC level and a VCO (Part 2) — measuring how much the sine distorts.",
     },
     approach: [
       {
-        pt: "LM311 como comparador e LM324 nos estágios de integração e formatação da senoide.",
-        en: "LM311 as the comparator and LM324 for the integrator and sine-shaping stages.",
+        pt: "Oscilador de relaxação: LM311 como comparador com histerese e LM324 como integrador; a senoide sai de um conformador a diodos.",
+        en: "Relaxation oscillator: an LM311 hysteresis comparator and an LM324 integrator; the sine comes from a diode shaper.",
       },
       {
-        pt: "Ajuste de componentes para ampliar a faixa: P1 de 5 k para 10 k e R6 de 62 k para 33 k.",
-        en: "Component changes to widen the range: P1 from 5 k to 10 k and R6 from 62 k to 33 k.",
+        pt: "Ajustes depois do primeiro teste de bancada para ampliar a faixa: P1 de 5 k para 10 k e R6 de 62 k para 33 k.",
+        en: "Changes after the first bench test to widen the range: P1 from 5 k to 10 k and R6 from 62 k to 33 k.",
       },
       {
-        pt: "FFT no osciloscópio Tektronix MSO2014B para medir as harmônicas da senoide na frequência máxima.",
-        en: "FFT on a Tektronix MSO2014B oscilloscope to measure the sine's harmonics at the top frequency.",
+        pt: "Simetria com dois diodos e o potenciômetro P2: cada semiciclo carrega o capacitor por um lado de P2, gerando pulso e dente-de-serra.",
+        en: "Symmetry with two diodes and pot P2: each half-cycle charges the capacitor through one side of P2, giving pulse and sawtooth waves.",
+      },
+      {
+        pt: "Etapa de saída com amplificador inversor (amplitude) e somador inversor (nível DC), e um VCO com transistor 2N3904 como chave.",
+        en: "Output stage with an inverting amplifier (amplitude) and an inverting summer (DC level), plus a VCO using a 2N3904 transistor as a switch.",
+      },
+      {
+        pt: "FFT no osciloscópio Tektronix MSO2014B, lendo cada harmônica com os cursores para calcular a THD.",
+        en: "FFT on a Tektronix MSO2014B oscilloscope, reading each harmonic with the cursors to compute THD.",
       },
     ],
     chain: [
       { id: "cmp", label: { pt: "Comparador", en: "Comparator" }, detail: { pt: "LM311 · quadrada", en: "LM311 · square" } },
       { id: "int", label: { pt: "Integrador", en: "Integrator" }, detail: { pt: "LM324 · triangular", en: "LM324 · triangle" } },
-      { id: "shape", label: { pt: "Formatador", en: "Shaper" }, detail: { pt: "senoide", en: "sine" } },
-      { id: "scope", label: { pt: "Osciloscópio", en: "Oscilloscope" }, detail: { pt: "FFT", en: "FFT" } },
+      { id: "shape", label: { pt: "Conformador", en: "Shaper" }, detail: { pt: "diodos · senoide", en: "diodes · sine" } },
+      { id: "out", label: { pt: "Saída", en: "Output" }, detail: { pt: "amplitude · offset", en: "amplitude · offset" } },
+      { id: "scope", label: { pt: "Osciloscópio", en: "Oscilloscope" }, detail: { pt: "FFT · THD", en: "FFT · THD" } },
     ],
     implementation: [
       {
-        pt: "Parte 2: controles de amplitude, offset e simetria, seleção de forma de onda e um VCO (oscilador controlado por tensão).",
-        en: "Part 2: amplitude, offset and symmetry controls, waveform selection and a VCO (voltage-controlled oscillator).",
+        pt: "Parte 1: oscilador e conformador senoidal na protoboard, em ±12 V.",
+        en: "Part 1: oscillator and sine shaper on a breadboard, at ±12 V.",
+      },
+      {
+        pt: "Parte 2: simetria, seleção da forma de onda, amplitude, nível DC e o VCO como desafio, com os limites de cada parâmetro definidos antes do projeto.",
+        en: "Part 2: symmetry, waveform selection, amplitude, DC level and the VCO as a stretch goal, with every parameter's limits set before design.",
+      },
+      {
+        pt: "Medição de cada forma de onda nas frequências mínima e máxima e de 10 harmônicas da senoide na FFT.",
+        en: "Each waveform measured at the minimum and maximum frequency, and 10 harmonics of the sine read on the FFT.",
       },
     ],
     result: {
-      pt: "Faixa medida de 5,76 kHz a 121 kHz na Parte 1; a Parte 2 adicionou os controles de saída e o VCO.",
-      en: "Measured range of 5.76 kHz to 121 kHz in Part 1; Part 2 added the output controls and the VCO.",
+      pt: "Na Parte 2, a saída cobriu de 0,91 kHz a ≈ 12 kHz (a meta era 1 a 10 kHz), o dente-de-serra funcionou nos dois sentidos e a THD da senoide ficou entre 3,5 % e 5,8 % em 2,38 kHz. Perto de 12 kHz as ondas começam a distorcer: o limite está no atraso do LM311 e no slew-rate de 0,5 V/µs do LM324.",
+      en: "In Part 2 the output covered 0.91 kHz to ≈ 12 kHz (the target was 1 to 10 kHz), the sawtooth worked in both directions and the sine's THD was between 3.5 % and 5.8 % at 2.38 kHz. Near 12 kHz the waves start to distort: the limit is the LM311's delay and the LM324's 0.5 V/µs slew rate.",
     },
     metrics: [
-      { value: "5,76–121 kHz", label: { pt: "faixa medida", en: "measured range" } },
-      { value: "±12 V", label: { pt: "alimentação", en: "supply" } },
+      { value: "5,76–121 kHz", label: { pt: "faixa, Parte 1", en: "range, Part 1" } },
+      { value: "0,91–12 kHz", label: { pt: "saída, Parte 2", en: "output, Part 2" } },
+      { value: "3,5–5,8 %", label: { pt: "THD da senoide", en: "sine THD" } },
     ],
-    technologies: ["LM311", "LM324", "Oscilloscope", "FFT"],
+    lessons: {
+      pt: "O medido ficou ≈ 0,52 vez o calculado na Parte 2 e ≈ 0,53 na Parte 1. Um fator quase constante apontou para termos fixos — tolerância do capacitor, capacitância da protoboard, atraso dos CIs — e não para erro de montagem.",
+      en: "Measured values were ≈ 0.52× the calculated ones in Part 2 and ≈ 0.53× in Part 1. A nearly constant factor pointed at fixed terms — capacitor tolerance, breadboard capacitance, IC delay — rather than a wiring mistake.",
+    },
+    media: [
+      {
+        src: "/work/gerador-de-funcoes/scope-senoide-68khz.webp",
+        width: 1600,
+        height: 1200,
+        alt: { pt: "Osciloscópio mostrando uma senoide de 68,2 kHz", en: "Oscilloscope showing a 68.2 kHz sine wave" },
+        caption: { pt: "Parte 1, primeiro teste de bancada: senoide a 68,2 kHz.", en: "Part 1, first bench test: sine at 68.2 kHz." },
+      },
+      {
+        src: "/work/gerador-de-funcoes/scope-quadrada-2-9khz.webp",
+        width: 1600,
+        height: 1200,
+        alt: { pt: "Osciloscópio mostrando uma onda quadrada de 2,92 kHz", en: "Oscilloscope showing a 2.92 kHz square wave" },
+        caption: { pt: "Parte 1: quadrada a 2,92 kHz, 12,1 V pico a pico.", en: "Part 1: square wave at 2.92 kHz, 12.1 V peak to peak." },
+      },
+      {
+        src: "/work/gerador-de-funcoes/scope-triangular-2-9khz.webp",
+        width: 1600,
+        height: 1200,
+        alt: { pt: "Osciloscópio mostrando uma onda triangular de 2,93 kHz", en: "Oscilloscope showing a 2.93 kHz triangle wave" },
+        caption: { pt: "Parte 1: triangular na mesma frequência.", en: "Part 1: triangle wave at the same frequency." },
+      },
+      {
+        src: "/work/gerador-de-funcoes/scope-dente-de-serra.webp",
+        width: 1600,
+        height: 1200,
+        alt: { pt: "Osciloscópio mostrando uma onda dente-de-serra", en: "Oscilloscope showing a sawtooth wave" },
+        caption: { pt: "Parte 2: com P2 num extremo, a triangular vira dente-de-serra (11,46 kHz).", en: "Part 2: with P2 at one end, the triangle becomes a sawtooth (11.46 kHz)." },
+      },
+      {
+        src: "/work/gerador-de-funcoes/fft-fundamental.webp",
+        width: 1600,
+        height: 1200,
+        alt: { pt: "FFT no osciloscópio com o pico da fundamental", en: "Oscilloscope FFT with the fundamental peak" },
+        caption: { pt: "FFT da senoide: fundamental em 2,40 kHz, 1,67 V.", en: "Sine FFT: fundamental at 2.40 kHz, 1.67 V." },
+      },
+      {
+        src: "/work/gerador-de-funcoes/fft-harmonicas.webp",
+        width: 1600,
+        height: 1200,
+        alt: { pt: "FFT ampliada com cursores na 2ª e 3ª harmônicas", en: "Zoomed FFT with cursors on the 2nd and 3rd harmonics" },
+        caption: { pt: "FFT ampliada: 2ª harmônica com 49,6 mV e 3ª com 32,0 mV.", en: "Zoomed FFT: 2nd harmonic at 49.6 mV, 3rd at 32.0 mV." },
+      },
+      {
+        src: "/work/gerador-de-funcoes/esquematico-blocos.webp",
+        width: 1600,
+        height: 617,
+        alt: { pt: "Diagrama de blocos do gerador de funções", en: "Block diagram of the function generator" },
+        caption: { pt: "Como os cinco blocos se ligam.", en: "How the five blocks connect." },
+      },
+      {
+        src: "/work/gerador-de-funcoes/esquematico-simetria-integrador.webp",
+        width: 1600,
+        height: 858,
+        alt: { pt: "Esquemático do bloco de simetria e integrador", en: "Schematic of the symmetry and integrator block" },
+        caption: { pt: "Bloco 2: simetria, ajuste de frequência e integrador.", en: "Block 2: symmetry, frequency adjustment and integrator." },
+      },
+    ],
+    technologies: ["LM311", "LM324", "2N3904", "VCO", "Oscilloscope", "FFT"],
     sources: [],
   },
   {

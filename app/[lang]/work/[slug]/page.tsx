@@ -77,14 +77,18 @@ export default async function CaseStudy({ params }: PageProps<"/[lang]/work/[slu
           <h2 className="col-span-12 mb-6 text-sm text-dim">{d.caseStudy.media}</h2>
           <div className="col-span-12 grid gap-[var(--gutter)] md:grid-cols-2">
             {p.media.map((m, i) => (
-              <figure key={m.src} className={i === 0 && p.media!.length % 2 === 1 ? "md:col-span-2" : ""}>
+              <figure key={m.src} data-reveal style={{ "--d": `${(i % 2) * 90}ms` } as React.CSSProperties} className={i === 0 && p.media!.length % 2 === 1 ? "md:col-span-2" : ""}>
                 <Image
                   src={m.src}
                   width={m.width}
                   height={m.height}
                   alt={t(m.alt, lang)}
                   sizes={i === 0 && p.media!.length % 2 === 1 ? "100vw" : "(min-width: 768px) 50vw, 100vw"}
-                  className="h-auto w-full bg-panel"
+                  className={
+                    m.height > m.width
+                      ? "mx-auto h-auto w-full bg-panel md:max-h-[680px] md:w-auto"
+                      : "h-auto w-full bg-panel"
+                  }
                 />
                 {m.caption && <figcaption className="mt-2 text-sm text-dim">{t(m.caption, lang)}</figcaption>}
               </figure>
@@ -140,6 +144,12 @@ export default async function CaseStudy({ params }: PageProps<"/[lang]/work/[slu
           </dl>
         )}
       </CaseSection>
+
+      {p.lessons && (
+        <CaseSection title={d.caseStudy.lessons}>
+          <p className="measure text-lg leading-snug">{t(p.lessons, lang)}</p>
+        </CaseSection>
+      )}
 
       <CaseSection title={d.caseStudy.technologies}>
         <ul className="flex flex-wrap gap-x-5 gap-y-2">
