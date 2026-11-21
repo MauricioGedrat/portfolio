@@ -143,7 +143,7 @@ Eventos: `page_view`, `project_view`, `resume_download`, `contact_click`, `cta_c
 | 6 | Lab: bancada virtual do gerador de funções (osciloscópio, FFT, THD, slew-rate do LM324) | feito |
 | 7 | /resume a partir dos mesmos dados, com versão de impressão; PDFs oficiais continuam para download | feito |
 | 8 | Formulário de contato → Supabase (honeypot, tempo mínimo, 5/dia por visitante); mensagens no /insights | feito |
-| 9–11 | /studio: edição dos textos dos projetos (PT/EN), ordem, destaque e ocultar; updateTag atualiza o site | código pronto; migração 0003 aguardando aprovação |
+| 9–11 | /studio: edição dos textos dos projetos (PT/EN), ordem, destaque e ocultar; updateTag atualiza o site | feito |
 | 12–13 | Analytics + painel /insights | feito |
 | 14–16 | sitemap, robots, imagens OG por página/projeto, JSON-LD, ícone; axe sem violações; Lighthouse mobile 96/100/100/100 | feito |
 
