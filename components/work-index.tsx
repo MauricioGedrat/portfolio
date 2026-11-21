@@ -12,7 +12,12 @@ export function WorkIndex({ items, lang, d }: { items: Project[]; lang: Locale; 
   return (
     <ol className="col-span-12 mt-10">
       {items.map((p, i) => (
-        <li key={p.slug} className="border-b border-graticule first:border-t">
+        <li
+          key={p.slug}
+          data-reveal="line"
+          style={{ "--d": `${Math.min(i, 5) * 80}ms` } as React.CSSProperties}
+          className="rule-b first:rule-y"
+        >
           <Link
             href={`/${lang}/work/${p.slug}`}
             className="group grid grid-cols-12 gap-x-[var(--gutter)] gap-y-3 py-7 outline-offset-[-2px] md:py-9"
@@ -51,12 +56,6 @@ export function WorkIndex({ items, lang, d }: { items: Project[]; lang: Locale; 
                   <dd>
                     {d.work.with} {p.collaborators.join(", ")}
                   </dd>
-                </div>
-              )}
-              {p.status && (
-                <div>
-                  <dt className="sr-only">Status</dt>
-                  <dd>{t(p.status, lang)}</dd>
                 </div>
               )}
             </dl>

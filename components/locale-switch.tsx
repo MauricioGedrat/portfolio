@@ -26,6 +26,8 @@ export function LocaleSwitch({ lang, label, switchTo }: { lang: Locale; label: s
             type="button"
             lang={l === "pt" ? "pt-BR" : "en"}
             onClick={() => go(l)}
+            data-track={l === lang ? undefined : "locale_switch"}
+            data-track-target={l}
             aria-pressed={l === lang}
             title={l === lang ? undefined : switchTo}
             className={`px-0.5 py-2 uppercase transition-colors duration-[var(--dur-fast)] ${

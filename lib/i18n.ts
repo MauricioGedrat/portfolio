@@ -66,6 +66,7 @@ const dictionary = {
     technologies: { pt: "Tecnologias", en: "Technologies" },
     lessons: { pt: "O que aprendi", en: "What I learned" },
     sources: { pt: "Fontes e links", en: "Sources and links" },
+    media: { pt: "Registros", en: "Records" },
     year: { pt: "Ano", en: "Year" },
     context: { pt: "Contexto", en: "Context" },
     team: { pt: "Equipe", en: "Team" },
@@ -78,14 +79,6 @@ const dictionary = {
     think: { pt: "Como penso", en: "How I think" },
     learning: { pt: "O que estou aprendendo", en: "What I'm learning" },
     looking: { pt: "O que procuro", en: "What I'm looking for" },
-    mediaAlt: {
-      pt: "Close de uma placa de circuito escura com trilhas de cobre.",
-      en: "Close-up of a dark circuit board with copper traces.",
-    },
-    mediaCaption: {
-      pt: "Ilustração gerada com IA (ElevenLabs). O pulso de luz é desenhado em código.",
-      en: "AI-generated illustration (ElevenLabs). The light pulse is drawn in code.",
-    },
   },
   lab: {
     title: { pt: "Lab", en: "Lab" },

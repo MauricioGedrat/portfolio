@@ -48,8 +48,14 @@ export function HeroName({ lines }: { lines: string[] }) {
       className="display text-[15.5vw] uppercase will-change-[font-stretch] md:text-[clamp(3.6rem,13.2vw,13.5rem)]"
       aria-label={lines.join(" ")}
     >
-      {lines.map((line) => (
-        <span key={line} aria-hidden className="block">
+      {lines.map((line, i) => (
+        <span
+          key={line}
+          aria-hidden
+          data-reveal="clip"
+          style={{ "--d": `${80 + i * 110}ms` } as React.CSSProperties}
+          className="block"
+        >
           {line}
         </span>
       ))}

@@ -23,7 +23,9 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
       {/* ───────────── Hero ───────────── */}
       <section className="relative isolate flex min-h-[100svh] flex-col overflow-hidden pt-[var(--nav-h)]">
         {/* Desktop: the scope fills the right side, behind the name, clear of the text. */}
-        <ScopeTrace className="absolute bottom-0 right-0 top-[var(--nav-h)] -z-10 hidden w-[64%] md:block [mask-image:linear-gradient(to_right,transparent,black_30%)]" />
+        <div data-reveal="fade" style={{ "--d": "250ms" } as React.CSSProperties} className="absolute bottom-0 right-0 top-[var(--nav-h)] -z-10 hidden w-[64%] md:block">
+          <ScopeTrace className="absolute inset-0 [mask-image:linear-gradient(to_right,transparent,black_30%)]" />
+        </div>
 
         <div className="grid-frame w-full pt-[7vh]">
           <div className="col-span-12">
@@ -35,19 +37,19 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
         <ScopeTrace className="relative mx-[var(--gutter)] mt-8 h-44 md:hidden" />
 
         <div className="grid-frame mt-auto w-full gap-y-6 pb-10 pt-10">
-          <div className="col-span-12 md:col-span-7 lg:col-span-5">
+          <div data-reveal style={{ "--d": "380ms" } as React.CSSProperties} className="col-span-12 md:col-span-7 lg:col-span-5">
             <p className="text-lg font-semibold">{profile.role[lang]}</p>
             <p className="measure mt-3 text-ink/85">{profile.statement[lang]}</p>
             <div className="mt-6 flex flex-wrap gap-3 text-sm">
-              <a href="#work" className="bg-ink px-4 py-2.5 font-semibold text-screen transition-colors hover:bg-ch1">
+              <a href="#work" data-track="cta_click" data-track-target="see-work" className="bg-ink px-4 py-2.5 font-semibold text-screen transition-colors hover:bg-ch1">
                 {d.hero.seeWork}
               </a>
-              <a href={cv} download className="border border-rule px-4 py-2.5 transition-colors hover:border-ink">
+              <a href={cv} download data-track="resume_download" data-track-target={lang} className="border border-rule px-4 py-2.5 transition-colors hover:border-ink">
                 {d.hero.download}
               </a>
             </div>
           </div>
-          <dl className="col-span-12 grid grid-cols-2 gap-x-6 gap-y-3 self-end text-sm md:col-span-5 md:col-start-8 lg:col-span-4 lg:col-start-9">
+          <dl data-reveal style={{ "--d": "520ms" } as React.CSSProperties} className="col-span-12 grid grid-cols-2 gap-x-6 gap-y-3 self-end text-sm md:col-span-5 md:col-start-8 lg:col-span-4 lg:col-start-9">
             <div>
               <dt className="text-dim">{lang === "pt" ? "Onde" : "Where"}</dt>
               <dd>{profile.location[lang]}</dd>
@@ -77,14 +79,14 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
       {/* ───────────── 02 About ───────────── */}
       <section id="about" aria-labelledby="about-title" className="grid-frame py-24 md:py-32">
         <SectionHeading id="about" title={d.about.title} />
-        <PcbPulse
-          alt={d.about.mediaAlt}
-          caption={d.about.mediaCaption}
-          className="col-span-12 mt-10 md:col-span-11 md:col-start-2"
-        />
         <dl className="col-span-12 mt-10 md:col-span-11 md:col-start-2">
-          {about.map(({ key, text }) => (
-            <div key={key} className="grid grid-cols-12 gap-x-[var(--gutter)] gap-y-2 border-b border-graticule py-7">
+          {about.map(({ key, text }, i) => (
+            <div
+              key={key}
+              data-reveal="line"
+              style={{ "--d": `${i * 70}ms` } as React.CSSProperties}
+              className="rule-b grid grid-cols-12 gap-x-[var(--gutter)] gap-y-2 py-7"
+            >
               <dt className="col-span-12 text-sm text-dim md:col-span-3">{d.about[key]}</dt>
               <dd className="measure col-span-12 text-lg leading-snug md:col-span-9">{t(text, lang)}</dd>
             </div>
@@ -101,8 +103,13 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
       <section id="experience" aria-labelledby="experience-title" className="grid-frame py-24 md:py-32">
         <SectionHeading id="experience" title={d.experience.title} />
         <ol className="col-span-12 mt-10 md:col-span-11 md:col-start-2">
-          {timeline.map((e) => (
-            <li key={e.id} className="grid grid-cols-12 gap-x-[var(--gutter)] gap-y-1 border-b border-graticule py-6">
+          {timeline.map((e, i) => (
+            <li
+              key={e.id}
+              data-reveal="line"
+              style={{ "--d": `${Math.min(i, 5) * 70}ms` } as React.CSSProperties}
+              className="rule-b grid grid-cols-12 gap-x-[var(--gutter)] gap-y-1 py-6"
+            >
               <span className="tabular col-span-12 text-sm text-dim md:col-span-3">{e.year}</span>
               <div className="col-span-12 md:col-span-9">
                 <p className="text-lg font-semibold leading-snug">
@@ -126,8 +133,13 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
       <section id="skills" aria-labelledby="skills-title" className="grid-frame py-24 md:py-32">
         <SectionHeading id="skills" title={d.skills.title} intro={d.skills.intro} />
         <div className="col-span-12 mt-10 md:col-span-11 md:col-start-2">
-          {skillGroups.map((g) => (
-            <div key={g.id} className="grid grid-cols-12 gap-x-[var(--gutter)] gap-y-3 border-b border-graticule py-7">
+          {skillGroups.map((g, i) => (
+            <div
+              key={g.id}
+              data-reveal="line"
+              style={{ "--d": `${i * 70}ms` } as React.CSSProperties}
+              className="rule-b grid grid-cols-12 gap-x-[var(--gutter)] gap-y-3 py-7"
+            >
               <div className="col-span-12 md:col-span-3">
                 <h3 className="text-lg font-semibold">{g.name[lang]}</h3>
                 <p className="mt-1 text-sm text-dim">{g.role[lang]}</p>
@@ -160,17 +172,25 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
       {/* ───────────── 06 Resume ───────────── */}
       <section id="resume" aria-labelledby="resume-title" className="grid-frame py-24 md:py-32">
         <SectionHeading id="resume" title={d.resume.title} />
-        <div className="col-span-12 mt-10 flex flex-wrap gap-3 text-sm md:col-span-11 md:col-start-2">
-          <a href={cv} download className="bg-ink px-4 py-2.5 font-semibold text-screen transition-colors hover:bg-ch1">
+        <div data-reveal className="col-span-12 mt-10 flex flex-wrap gap-3 text-sm md:col-span-11 md:col-start-2">
+          <a href={cv} download data-track="resume_download" data-track-target={lang} className="bg-ink px-4 py-2.5 font-semibold text-screen transition-colors hover:bg-ch1">
             {d.resume.download}
           </a>
         </div>
       </section>
 
       {/* ───────────── 07 Contact ───────────── */}
-      <section id="contact" aria-labelledby="contact-title" className="grid-frame py-24 md:py-40">
+      <section
+        id="contact"
+        aria-labelledby="contact-title"
+        className="grid-frame relative isolate min-h-[88svh] content-start overflow-hidden py-24 md:py-40"
+      >
+        {/* Backdrop: the board sits low and dim; the signal pulse crosses it under the text. */}
+        <PcbPulse className="absolute inset-0 -z-10 opacity-70">
+          <div className="absolute inset-0 bg-gradient-to-b from-screen via-screen/70 to-screen/20" />
+        </PcbPulse>
         <SectionHeading id="contact" title={d.contact.title} intro={d.contact.intro} />
-        <div className="col-span-12 mt-10 md:col-span-11 md:col-start-2">
+        <div data-reveal style={{ "--d": "160ms" } as React.CSSProperties} className="col-span-12 mt-10 md:col-span-11 md:col-start-2">
           <a href={`mailto:${profile.email}`} className="display condensed link-quiet text-[clamp(1.8rem,5vw,4.2rem)] font-bold">
             {profile.email}
           </a>

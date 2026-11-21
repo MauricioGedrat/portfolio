@@ -275,19 +275,18 @@ export const projects: Project[] = [
     ],
     implementation: [
       {
-        pt: "Parte 2 em andamento: controles de amplitude, offset, simetria, seleção de forma de onda e VCO.",
-        en: "Part 2 in progress: amplitude, offset, symmetry, waveform selection and VCO controls.",
+        pt: "Parte 2: controles de amplitude, offset e simetria, seleção de forma de onda e um VCO (oscilador controlado por tensão).",
+        en: "Part 2: amplitude, offset and symmetry controls, waveform selection and a VCO (voltage-controlled oscillator).",
       },
     ],
     result: {
-      pt: "Faixa medida de 5,76 kHz a 121 kHz na primeira parte.",
-      en: "Measured range of 5.76 kHz to 121 kHz in part one.",
+      pt: "Faixa medida de 5,76 kHz a 121 kHz na Parte 1; a Parte 2 adicionou os controles de saída e o VCO.",
+      en: "Measured range of 5.76 kHz to 121 kHz in Part 1; Part 2 added the output controls and the VCO.",
     },
     metrics: [
       { value: "5,76–121 kHz", label: { pt: "faixa medida", en: "measured range" } },
       { value: "±12 V", label: { pt: "alimentação", en: "supply" } },
     ],
-    status: { pt: "Parte 2 em andamento", en: "Part 2 in progress" },
     technologies: ["LM311", "LM324", "Oscilloscope", "FFT"],
     sources: [],
   },

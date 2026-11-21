@@ -120,6 +120,84 @@
   }
 }
 
+/* ─── Build-up on scroll ───────────────────────────────────────────
+   Elements marked data-reveal start "unpowered" and switch on when they
+   enter the viewport (RevealObserver sets data-shown). Hidden state only
+   applies when JS has flagged <html class="js-reveal">, so no-JS visitors
+   and crawlers always get the full page. */
+@utility rule-b {
+  background: linear-gradient(var(--color-graticule), var(--color-graticule)) left bottom / 100% 1px no-repeat;
+}
+@utility rule-t {
+  background: linear-gradient(var(--color-graticule), var(--color-graticule)) left top / 100% 1px no-repeat;
+}
+@utility rule-y {
+  background:
+    linear-gradient(var(--color-graticule), var(--color-graticule)) left top / 100% 1px no-repeat,
+    linear-gradient(var(--color-graticule), var(--color-graticule)) left bottom / 100% 1px no-repeat;
+}
+
+html.js-reveal [data-reveal] {
+  transition:
+    opacity var(--dur-slow) var(--ease-out-expo) var(--d, 0ms),
+    transform 900ms var(--ease-out-expo) var(--d, 0ms),
+    clip-path 900ms var(--ease-out-expo) var(--d, 0ms),
+    background-size 1100ms var(--ease-out-expo) var(--d, 0ms);
+}
+html.js-reveal [data-reveal]:not([data-shown]) {
+  opacity: 0;
+  transform: translateY(1.25rem);
+}
+/* Display type wipes up from its baseline instead of fading. */
+html.js-reveal [data-reveal="clip"] {
+  clip-path: inset(-0.2em -0.1em -0.25em -0.1em);
+}
+html.js-reveal [data-reveal="clip"]:not([data-shown]) {
+  opacity: 1;
+  clip-path: inset(calc(100% + 0.3em) -0.1em -0.25em -0.1em);
+  transform: translateY(0.35em);
+}
+/* Hairlines draw left to right, like a sweep across the screen. */
+html.js-reveal [data-reveal="line"]:not([data-shown]) {
+  opacity: 1;
+  transform: none;
+}
+html.js-reveal [data-reveal="line"].rule-b:not([data-shown]),
+html.js-reveal [data-reveal="line"].rule-t:not([data-shown]) {
+  background-size: 0% 1px;
+}
+html.js-reveal [data-reveal="line"].rule-y:not([data-shown]) {
+  background-size: 0% 1px, 0% 1px;
+}
+html.js-reveal [data-reveal="line"] > * {
+  transition:
+    opacity var(--dur-slow) var(--ease-out-expo) calc(var(--d, 0ms) + 120ms),
+    transform 900ms var(--ease-out-expo) calc(var(--d, 0ms) + 120ms);
+}
+html.js-reveal [data-reveal="line"]:not([data-shown]) > * {
+  opacity: 0;
+  transform: translateY(1rem);
+}
+html.js-reveal [data-reveal="fade"]:not([data-shown]) {
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.js-reveal [data-reveal],
+  html.js-reveal [data-reveal] > * {
+    opacity: 1 !important;
+    transform: none !important;
+    clip-path: none !important;
+  }
+  html.js-reveal [data-reveal].rule-b,
+  html.js-reveal [data-reveal].rule-t {
+    background-size: 100% 1px !important;
+  }
+  html.js-reveal [data-reveal].rule-y {
+    background-size: 100% 1px, 100% 1px !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

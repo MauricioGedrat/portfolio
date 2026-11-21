@@ -31,10 +31,11 @@ Documento vivo. Descreve como o site é montado, o que já existe e o que vem em
 /[lang]/work/[slug]   → estudo de caso
 /[lang]/resume        → currículo em HTML (fase 7)
 /api/contact          → POST do formulário (fase 8)
-/api/track            → eventos de analytics (fase 12)
+/api/track            → grava um evento (feito)
+/api/insights         → lê o painel com senha (feito)
 /api/keepalive        → cron diário que evita a pausa do Supabase
 /studio               → CMS privado (fase 9), noindex, Supabase Auth
-/insights             → painel de analytics privado (fase 13), noindex
+/[lang]/insights      → painel de visitas com senha, noindex (feito)
 ```
 
 Escolha do idioma: cookie `mg-locale` → `Accept-Language` → `pt`. O seletor PT/EN grava o cookie e troca a rota mantendo o `#hash`.
@@ -93,11 +94,15 @@ RLS: tudo fechado para `anon`, exceto `insert` em `events` e `messages` via rota
 
 Publicação: o CMS salva no Supabase e dispara um Deploy Hook da Vercel. O build lê o Supabase. Se o Supabase estiver fora, o build usa `content/*.ts` como fallback.
 
-## 7. Eventos de analytics
+## 7. Analytics (feito)
 
-`page_view`, `project_view`, `project_open`, `resume_view`, `resume_download`, `contact_start`, `contact_submit`, `cta_click`, `external_link_click`.
+Eventos: `page_view`, `project_view`, `resume_download`, `contact_click`, `cta_click`, `external_link_click`, `locale_switch`.
 
-Identificador de sessão: hash diário de (user-agent + dia + sal), nunca IP salvo.
+- O navegador manda o evento para `/api/track` (sendBeacon). A rota descarta bots, lê cidade/estado/país dos headers da Vercel e chama `track_event` no Supabase.
+- Visitante = hash de IP + navegador + dia (muda todo dia, não dá para reverter). Nenhum IP é salvo, nenhum cookie.
+- `public.site_events` tem RLS sem policies: ninguém lê direto. A leitura é só por `get_insights(senha, dias)`, que confere o hash bcrypt em `private.insights_secret`.
+- Quem abre `/insights` e entra fica marcado no navegador (`localStorage mg-owner`) e para de ser contado.
+- SQL em `supabase/migrations/0001_site_analytics.sql`. Trocar a senha: `update private.insights_secret set hash = extensions.crypt('NOVA', extensions.gen_salt('bf', 10));`
 
 ## 8. Sistema de design — "osciloscópio"
 
@@ -136,7 +141,7 @@ Identificador de sessão: hash diário de (user-agent + dia + sal), nunca IP sal
 | 7 | Página /resume e PDF a partir dos mesmos dados | |
 | 8 | Formulário de contato (Resend, honeypot, rate limit) | |
 | 9–11 | CMS no Supabase | |
-| 12–13 | Analytics + painel /insights | |
+| 12–13 | Analytics + painel /insights | feito |
 | 14–16 | SEO (sitemap, robots, OG), a11y, performance, polimento | |
 
 ## 11. Limites dos planos grátis

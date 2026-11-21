@@ -59,9 +59,10 @@ export interface Project {
   implementation: L[];
   result: L;
   metrics?: Metric[];
+  /** Real photos/captures of this project, in /public/work/<slug>/. First one is the cover. */
+  media?: ProjectMedia[];
   technologies: string[];
   lessons?: L;
-  status?: L;
   sources: SourceLink[];
 }
 
@@ -97,3 +98,11 @@ export interface Profile {
   links: { github: string; linkedin: string };
   languages: { name: L; level: L }[];
 }
+
+export type ProjectMedia = {
+  src: string;
+  width: number;
+  height: number;
+  alt: L;
+  caption?: L;
+};

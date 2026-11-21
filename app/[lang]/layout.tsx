@@ -2,6 +2,9 @@ import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { notFound } from "next/navigation";
 import "../globals.css";
+import { Analytics } from "@/components/analytics";
+import { RevealObserver } from "@/components/reveal-observer";
+import { revealBootScript } from "@/lib/reveal-boot";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { getDictionary, hasLocale, locales } from "@/lib/i18n";
@@ -39,8 +42,13 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
   const d = getDictionary(lang);
 
   return (
-    <html lang={lang === "pt" ? "pt-BR" : "en"} className={archivo.variable}>
+    <html lang={lang === "pt" ? "pt-BR" : "en"} className={archivo.variable} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: revealBootScript }} />
+      </head>
       <body className="font-sans">
+        <RevealObserver />
+        <Analytics />
         <a
           href="#main"
           className="sr-only z-50 bg-ch1 px-4 py-2 text-screen focus:not-sr-only focus:fixed focus:left-4 focus:top-4"

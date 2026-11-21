@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SignalChain } from "@/components/signal-chain";
@@ -32,13 +33,13 @@ export default async function CaseStudy({ params }: PageProps<"/[lang]/work/[slu
         <Link href={`/${lang}#work`} className="col-span-12 text-sm text-dim hover:text-ink">
           ← {d.caseStudy.back}
         </Link>
-        <h1 className="display condensed col-span-12 mt-10 text-[clamp(2.8rem,8vw,7.5rem)] lg:col-span-11">
+        <h1 data-reveal="clip" style={{ "--d": "60ms" } as React.CSSProperties} className="display condensed col-span-12 mt-10 text-[clamp(2.8rem,8vw,7.5rem)] lg:col-span-11">
           {headline}
           {subhead && <span className="mt-3 block text-[0.42em] font-semibold leading-tight text-dim">{subhead.trim()}</span>}
         </h1>
-        <p className="measure col-span-12 mt-8 text-lg leading-snug md:col-span-8">{t(p.subtitle, lang)}</p>
+        <p data-reveal style={{ "--d": "260ms" } as React.CSSProperties} className="measure col-span-12 mt-8 text-lg leading-snug md:col-span-8">{t(p.subtitle, lang)}</p>
 
-        <dl className="col-span-12 mt-12 grid grid-cols-2 gap-x-6 gap-y-5 border-t border-graticule pt-5 text-sm md:grid-cols-4">
+        <dl data-reveal="line" style={{ "--d": "380ms" } as React.CSSProperties} className="rule-t col-span-12 mt-12 grid grid-cols-2 gap-x-6 gap-y-5 pt-5 text-sm md:grid-cols-4">
           <div>
             <dt className="text-dim">{d.caseStudy.year}</dt>
             <dd className="tabular">{p.period ? t(p.period, lang) : p.year}</dd>
@@ -70,6 +71,27 @@ export default async function CaseStudy({ params }: PageProps<"/[lang]/work/[slu
       <CaseSection title={d.caseStudy.overview}>
         <p className="measure text-lg leading-snug">{t(p.summary, lang)}</p>
       </CaseSection>
+
+      {p.media && p.media.length > 0 && (
+        <section data-reveal="line" className="rule-t grid-frame py-12">
+          <h2 className="col-span-12 mb-6 text-sm text-dim">{d.caseStudy.media}</h2>
+          <div className="col-span-12 grid gap-[var(--gutter)] md:grid-cols-2">
+            {p.media.map((m, i) => (
+              <figure key={m.src} className={i === 0 && p.media!.length % 2 === 1 ? "md:col-span-2" : ""}>
+                <Image
+                  src={m.src}
+                  width={m.width}
+                  height={m.height}
+                  alt={t(m.alt, lang)}
+                  sizes={i === 0 && p.media!.length % 2 === 1 ? "100vw" : "(min-width: 768px) 50vw, 100vw"}
+                  className="h-auto w-full bg-panel"
+                />
+                {m.caption && <figcaption className="mt-2 text-sm text-dim">{t(m.caption, lang)}</figcaption>}
+              </figure>
+            ))}
+          </div>
+        </section>
+      )}
 
       <CaseSection title={d.caseStudy.problem}>
         <p className="measure">{t(p.problem, lang)}</p>
@@ -141,14 +163,16 @@ export default async function CaseStudy({ params }: PageProps<"/[lang]/work/[slu
         </CaseSection>
       )}
 
-      <nav className="grid-frame border-t border-graticule py-16" aria-label={d.caseStudy.next}>
+      <nav data-reveal="line" className="rule-t grid-frame py-16" aria-label={d.caseStudy.next}>
         <p className="col-span-12 text-sm text-dim">{d.caseStudy.next}</p>
+        <div className="col-span-12 mt-4">
         <Link
           href={`/${lang}/work/${next.slug}`}
-          className="display condensed col-span-12 mt-4 text-[clamp(2rem,5vw,4.5rem)] font-bold transition-[font-stretch] duration-[var(--dur-slow)] ease-[var(--ease-out-expo)] hover:[font-stretch:96%]"
+          className="display condensed text-[clamp(2rem,5vw,4.5rem)] font-bold transition-[font-stretch] duration-[var(--dur-slow)] ease-[var(--ease-out-expo)] hover:[font-stretch:96%]"
         >
           {next.title.split(":")[0]}
         </Link>
+        </div>
       </nav>
     </article>
   );
@@ -156,7 +180,7 @@ export default async function CaseStudy({ params }: PageProps<"/[lang]/work/[slu
 
 function CaseSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="grid-frame border-t border-graticule py-12">
+    <section data-reveal="line" className="rule-t grid-frame py-12">
       <h2 className="col-span-12 mb-4 text-sm text-dim md:col-span-3 md:mb-0">{title}</h2>
       <div className="col-span-12 md:col-span-9">{children}</div>
     </section>
